@@ -6,3 +6,7 @@
   - Fields should be private
   - Methods used within same class should be private
 - There should be an empty space before any return keyword
+
+## Spring
+
+- Use Spring Boot 4
