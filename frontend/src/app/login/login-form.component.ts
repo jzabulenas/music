@@ -38,7 +38,7 @@ export class LoginFormComponent {
     // The `!` is added to pass error checking
     const body = new HttpParams().set('username', this.form.controls.email.value!);
 
-    this.http.post('/login/ott', body).subscribe({
+    this.http.post('/ott/generate', body).subscribe({
       next: () => {
         this.submitted.emit();
       },

@@ -33,7 +33,7 @@ class SecurityConfig {
     http
       .authorizeHttpRequests(auth ->
         auth
-          .requestMatchers("/login/ott", "/error")
+          .requestMatchers("/ott/generate", "/login/ott", "/error")
           .permitAll()
           .anyRequest()
           .authenticated()
@@ -55,7 +55,7 @@ class SecurityConfig {
       .csrf(csrf ->
         csrf
           .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
-          .ignoringRequestMatchers("/login/ott", "/logout")
+          .ignoringRequestMatchers("/ott/generate", "/logout")
       )
       .cors(cors -> cors.configurationSource(corsConfigurationSource()));
 
