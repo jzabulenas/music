@@ -4,6 +4,10 @@
 - Prefer type inference when the type is obvious
 - Avoid the `any` type; use `unknown` when type is uncertain
 - Before `return` inside methods or functions, there must be an empty line
+- If above and below an `if` statement is variable definition, you must add an empty line above and below the `if` statement
+  - Same applies to templates, albeit there may be HTML tags
+- Inside of functions or methods, variable definitions should be grouped when it makes sense
+- When writing comments, if you refer to code, encase it with ``
 
 ## Angular Best Practices
 
@@ -21,7 +25,7 @@
 - Use `input()` and `output()` functions instead of decorators
 - Use `computed()` for derived state
 - Set `changeDetection: ChangeDetectionStrategy.OnPush` in `@Component` decorator
-- Prefer inline templates for small components
+- Always use separate template and CSS files for components
 - Prefer Reactive forms instead of Template-driven ones
 - Do NOT use `ngClass`, use `class` bindings instead
 - Do NOT use `ngStyle`, use `style` bindings instead
