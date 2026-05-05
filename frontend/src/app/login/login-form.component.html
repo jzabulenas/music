@@ -1,0 +1,20 @@
+<form [formGroup]="form" (ngSubmit)="submit()">
+  <mat-form-field appearance="outline" class="full-width">
+    <mat-label>Email address</mat-label>
+    <input matInput type="email" formControlName="email" autocomplete="email" />
+
+    @if (emailControl.hasError('required') && emailControl.touched) {
+      <mat-error>Email is required</mat-error>
+    } @else if (emailControl.hasError('email') && emailControl.touched) {
+      <mat-error>Enter a valid email address</mat-error>
+    }
+  </mat-form-field>
+
+  <button mat-flat-button type="submit" class="full-width" [disabled]="loading()">
+    {{ loading() ? 'Sending…' : 'Send magic link' }}
+  </button>
+
+  @if (error()) {
+    <p class="error-msg" role="alert">{{ error() }}</p>
+  }
+</form>

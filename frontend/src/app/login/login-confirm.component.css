@@ -1,0 +1,8 @@
+h2 {
+  margin: 0 0 8px;
+}
+
+p {
+  margin: 4px 0;
+  color: var(--mat-sys-on-surface-variant);
+}
