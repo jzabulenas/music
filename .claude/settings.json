@@ -1,0 +1,15 @@
+{
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "FILE=$(jq -r '.tool_input.file_path'); if echo \"$FILE\" | grep -q '/frontend/'; then cd /var/home/julius/git/music/frontend && npx prettier --write \"$FILE\"; elif echo \"$FILE\" | grep -q '/backend/'; then cd /var/home/julius/git/music/backend && npx prettier --plugin=prettier-plugin-java --write \"$FILE\"; fi"
+          }
+        ]
+      }
+    ]
+  }
+}
