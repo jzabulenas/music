@@ -25,7 +25,9 @@ class RecommendationController {
   List<RecommendationResponse> list(
     @AuthenticationPrincipal UserDetails userDetails
   ) {
-    Long userId = this.userService.findByEmail(userDetails.getUsername()).getId();
+    Long userId = this.userService.findByEmail(
+      userDetails.getUsername()
+    ).getId();
 
     return this.recommendationService.getAll(userId);
   }
@@ -34,7 +36,9 @@ class RecommendationController {
   List<RecommendationResponse> generate(
     @AuthenticationPrincipal UserDetails userDetails
   ) {
-    Long userId = this.userService.findByEmail(userDetails.getUsername()).getId();
+    Long userId = this.userService.findByEmail(
+      userDetails.getUsername()
+    ).getId();
 
     return this.recommendationService.generate(userId);
   }

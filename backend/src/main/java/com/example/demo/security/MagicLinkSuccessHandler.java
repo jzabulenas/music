@@ -41,7 +41,7 @@ class MagicLinkSuccessHandler implements OneTimeTokenGenerationSuccessHandler {
     try {
       MimeMessage message = this.mailSender.createMimeMessage();
       MimeMessageHelper helper = new MimeMessageHelper(message, "UTF-8");
-      
+
       helper.setTo(oneTimeToken.getUsername());
       helper.setFrom("noreply@music-rec.local");
       helper.setSubject("Your sign-in link");

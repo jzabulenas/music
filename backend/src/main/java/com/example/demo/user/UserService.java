@@ -14,16 +14,14 @@ public class UserService {
 
   @Transactional
   public User findOrCreate(String email) {
-    return this.repository
-      .findByEmail(email)
-      .orElseGet(() -> this.repository.save(new User(email)));
+    return this.repository.findByEmail(email).orElseGet(() ->
+      this.repository.save(new User(email))
+    );
   }
 
   public User findByEmail(String email) {
-    return this.repository
-      .findByEmail(email)
-      .orElseThrow(() ->
-        new IllegalArgumentException("User not found: " + email)
-      );
+    return this.repository.findByEmail(email).orElseThrow(() ->
+      new IllegalArgumentException("User not found: " + email)
+    );
   }
 }

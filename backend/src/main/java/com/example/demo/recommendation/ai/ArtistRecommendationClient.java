@@ -16,8 +16,7 @@ public class ArtistRecommendationClient {
   public List<RecommendedArtist> recommend(List<String> likedArtists) {
     String artistList = String.join(", ", likedArtists);
 
-    RecommendedArtistResponse response = this.chatClient
-      .prompt()
+    RecommendedArtistResponse response = this.chatClient.prompt()
       .user(u ->
         u
           .text(

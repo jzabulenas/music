@@ -25,7 +25,9 @@ class LikedArtistController {
 
   @GetMapping
   List<ArtistResponse> list(@AuthenticationPrincipal UserDetails userDetails) {
-    Long userId = this.userService.findByEmail(userDetails.getUsername()).getId();
+    Long userId = this.userService.findByEmail(
+      userDetails.getUsername()
+    ).getId();
 
     return this.likedArtistService.findAll(userId);
   }
@@ -36,7 +38,9 @@ class LikedArtistController {
     @AuthenticationPrincipal UserDetails userDetails,
     @Valid @RequestBody AddArtistRequest request
   ) {
-    Long userId = this.userService.findByEmail(userDetails.getUsername()).getId();
+    Long userId = this.userService.findByEmail(
+      userDetails.getUsername()
+    ).getId();
 
     return this.likedArtistService.add(userId, request.name());
   }
@@ -47,7 +51,9 @@ class LikedArtistController {
     @AuthenticationPrincipal UserDetails userDetails,
     @PathVariable Long id
   ) {
-    Long userId = this.userService.findByEmail(userDetails.getUsername()).getId();
+    Long userId = this.userService.findByEmail(
+      userDetails.getUsername()
+    ).getId();
 
     this.likedArtistService.delete(id, userId);
   }

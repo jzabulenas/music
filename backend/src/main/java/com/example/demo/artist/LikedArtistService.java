@@ -16,8 +16,7 @@ public class LikedArtistService {
   }
 
   public List<ArtistResponse> findAll(Long userId) {
-    return this.repository
-      .findByUserId(userId)
+    return this.repository.findByUserId(userId)
       .stream()
       .map(a -> new ArtistResponse(a.getId(), a.getName(), a.getAddedAt()))
       .toList();
@@ -48,8 +47,7 @@ public class LikedArtistService {
   }
 
   public List<String> getNames(Long userId) {
-    return this.repository
-      .findByUserId(userId)
+    return this.repository.findByUserId(userId)
       .stream()
       .map(LikedArtist::getName)
       .toList();

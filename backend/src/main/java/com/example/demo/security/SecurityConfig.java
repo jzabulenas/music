@@ -42,7 +42,9 @@ class SecurityConfig {
         ott
           .tokenGenerationSuccessHandler(magicLinkSuccessHandler)
           .successHandler(
-            new SimpleUrlAuthenticationSuccessHandler(this.baseUrl + "/app/artists")
+            new SimpleUrlAuthenticationSuccessHandler(
+              this.baseUrl + "/app/artists"
+            )
           )
       )
       .logout(logout ->

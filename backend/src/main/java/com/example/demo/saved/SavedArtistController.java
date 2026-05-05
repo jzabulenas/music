@@ -27,7 +27,9 @@ class SavedArtistController {
   List<SavedArtistResponse> list(
     @AuthenticationPrincipal UserDetails userDetails
   ) {
-    Long userId = this.userService.findByEmail(userDetails.getUsername()).getId();
+    Long userId = this.userService.findByEmail(
+      userDetails.getUsername()
+    ).getId();
 
     return this.savedArtistService.findAll(userId);
   }
@@ -38,9 +40,15 @@ class SavedArtistController {
     @AuthenticationPrincipal UserDetails userDetails,
     @Valid @RequestBody SaveArtistRequest request
   ) {
-    Long userId = this.userService.findByEmail(userDetails.getUsername()).getId();
+    Long userId = this.userService.findByEmail(
+      userDetails.getUsername()
+    ).getId();
 
-    return this.savedArtistService.save(userId, request.name(), request.genre());
+    return this.savedArtistService.save(
+      userId,
+      request.name(),
+      request.genre()
+    );
   }
 
   @DeleteMapping("/{id}")
@@ -49,7 +57,9 @@ class SavedArtistController {
     @AuthenticationPrincipal UserDetails userDetails,
     @PathVariable Long id
   ) {
-    Long userId = this.userService.findByEmail(userDetails.getUsername()).getId();
+    Long userId = this.userService.findByEmail(
+      userDetails.getUsername()
+    ).getId();
 
     this.savedArtistService.delete(id, userId);
   }

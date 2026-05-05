@@ -16,8 +16,7 @@ class SavedArtistService {
   }
 
   public List<SavedArtistResponse> findAll(Long userId) {
-    return this.repository
-      .findByUserId(userId)
+    return this.repository.findByUserId(userId)
       .stream()
       .map(a ->
         new SavedArtistResponse(

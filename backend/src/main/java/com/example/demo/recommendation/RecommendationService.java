@@ -27,8 +27,7 @@ class RecommendationService {
   }
 
   List<RecommendationResponse> getAll(Long userId) {
-    return this.repository
-      .findByUserId(userId)
+    return this.repository.findByUserId(userId)
       .stream()
       .map(r ->
         new RecommendationResponse(
@@ -44,7 +43,7 @@ class RecommendationService {
   @Transactional
   public List<RecommendationResponse> generate(Long userId) {
     List<String> names = this.likedArtistService.getNames(userId);
-    
+
     if (names.size() < 3) {
       throw new ResponseStatusException(
         HttpStatusCode.valueOf(422),
