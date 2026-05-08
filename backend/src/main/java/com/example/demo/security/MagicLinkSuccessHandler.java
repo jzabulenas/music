@@ -19,8 +19,8 @@ class MagicLinkSuccessHandler implements OneTimeTokenGenerationSuccessHandler {
 
   private final JavaMailSender mailSender;
 
-  @Value("${app.backend-url}")
-  private String backendUrl;
+  @Value("${app.base-url}")
+  private String baseUrl;
 
   MagicLinkSuccessHandler(JavaMailSender mailSender) {
     this.mailSender = mailSender;
@@ -32,7 +32,7 @@ class MagicLinkSuccessHandler implements OneTimeTokenGenerationSuccessHandler {
     HttpServletResponse response,
     OneTimeToken oneTimeToken
   ) throws IOException, ServletException {
-    String magicLink = UriComponentsBuilder.fromUriString(this.backendUrl)
+    String magicLink = UriComponentsBuilder.fromUriString(this.baseUrl)
       .path("/login/ott")
       .queryParam("token", oneTimeToken.getTokenValue())
       .build()

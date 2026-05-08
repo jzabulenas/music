@@ -6,6 +6,11 @@ export const routes: Routes = [
     path: 'login',
     loadComponent: () => import('./login/login.component').then((m) => m.LoginComponent),
   },
+  // Activates when `return '/index.html';` gets called in `proxy.conf.js`
+  {
+    path: 'login/ott',
+    loadComponent: () => import('./login/login-ott.component').then((m) => m.LoginOttComponent),
+  },
   {
     path: 'app',
     loadComponent: () => import('./shell/shell.component').then((m) => m.ShellComponent),

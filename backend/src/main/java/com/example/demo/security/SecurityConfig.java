@@ -57,7 +57,7 @@ class SecurityConfig {
       .csrf(csrf ->
         csrf
           .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
-          .ignoringRequestMatchers("/ott/generate", "/logout")
+          .ignoringRequestMatchers("/ott/generate", "/login/ott", "/logout")
       )
       .cors(cors -> cors.configurationSource(corsConfigurationSource()));
 
