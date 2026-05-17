@@ -6,9 +6,9 @@ import {
   OnInit,
   signal,
 } from '@angular/core';
-import { ArtistInputComponent } from './artist-input.component';
-import { ArtistListComponent } from './artist-list.component';
-import { ArtistService } from './artist.service';
+import { ArtistInputComponent } from './input/artist-input.component';
+import { ArtistListComponent } from './list/artist-list.component';
+import { ArtistService } from '../artist.service';
 
 @Component({
   selector: 'app-artists-page',

@@ -27,6 +27,7 @@ export class ArtistInputComponent {
 
       return;
     }
+
     this.artistAdded.emit(this.nameControl.value!);
     this.form.reset();
   }

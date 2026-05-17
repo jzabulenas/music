@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, input, output } from '@angular/core';
-import { ArtistChipComponent } from './artist-chip.component';
-import { LikedArtist } from './liked-artist.model';
+import { ArtistChipComponent } from './item/artist-chip.component';
+import { LikedArtist } from '../../liked-artist.model';
 
 @Component({
   selector: 'app-artist-list',

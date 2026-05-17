@@ -19,7 +19,7 @@ export const routes: Routes = [
       {
         path: 'artists',
         loadComponent: () =>
-          import('./artist/artists-page.component').then((m) => m.ArtistsPageComponent),
+          import('./artist/page/artists-page.component').then((m) => m.ArtistsPageComponent),
       },
       {
         path: 'recommendations',

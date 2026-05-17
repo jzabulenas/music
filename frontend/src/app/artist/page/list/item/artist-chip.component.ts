@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, Component, input, output } from '@angular/core';
 import { MatChipsModule } from '@angular/material/chips';
 import { MatIconModule } from '@angular/material/icon';
-import { LikedArtist } from './liked-artist.model';
+import { LikedArtist } from '../../../liked-artist.model';
 
 @Component({
   selector: 'app-artist-chip',
