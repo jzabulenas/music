@@ -10,7 +10,6 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationSuccessHandler;
-import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
@@ -56,7 +55,7 @@ class SecurityConfig {
       )
       .csrf(csrf ->
         csrf
-          .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
+          .spa()
           .ignoringRequestMatchers("/ott/generate", "/login/ott", "/logout")
       )
       .cors(cors -> cors.configurationSource(corsConfigurationSource()));
