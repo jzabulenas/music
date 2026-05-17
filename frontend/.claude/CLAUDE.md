@@ -18,6 +18,13 @@
 - Do NOT use the `@HostBinding` and `@HostListener` decorators. Put host bindings inside the `host` object of the `@Component` or `@Directive` decorator instead
 - Use `NgOptimizedImage` for all static images.
   - `NgOptimizedImage` does not work for inline base64 images.
+- When creating components, place and separated them (component, template and css) in logical and connected folder order, such as:
+  - `artist`
+    - `page`
+      - `input`
+      - `list`
+        - `item`
+  - The goal is to make it easier to understand what belongs to who
 
 ### Components
 

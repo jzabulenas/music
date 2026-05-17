@@ -16,6 +16,8 @@
 ## Spring
 
 - Use Spring Boot 4
+  - Use Spring Framework 7
+  - Use Spring Security 7
 
 ### JPA
 
