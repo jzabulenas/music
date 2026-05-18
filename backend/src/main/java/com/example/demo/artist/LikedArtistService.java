@@ -4,6 +4,7 @@ import java.util.List;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
 @Service
@@ -42,6 +43,8 @@ public class LikedArtistService {
     }
   }
 
+  // `deleteByIdAndUserId` uses `em.remove()` internally, which requires an active transaction.
+  @Transactional
   public void delete(Long id, Long userId) {
     this.repository.deleteByIdAndUserId(id, userId);
   }
