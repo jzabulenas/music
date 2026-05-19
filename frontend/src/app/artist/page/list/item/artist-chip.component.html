@@ -1,0 +1,6 @@
+<mat-chip (removed)="onRemove()">
+  {{ artist().name }}
+  <button matChipRemove [attr.aria-label]="'Remove ' + artist().name">
+    <mat-icon>cancel</mat-icon>
+  </button>
+</mat-chip>

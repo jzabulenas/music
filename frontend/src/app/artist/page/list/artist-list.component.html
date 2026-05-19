@@ -1,0 +1,9 @@
+@if (artists().length > 0) {
+  <ul class="chip-list" aria-label="Liked artists">
+    @for (artist of artists(); track artist.id) {
+      <li>
+        <app-artist-chip [artist]="artist" (deleted)="deleted.emit($event)" />
+      </li>
+    }
+  </ul>
+}

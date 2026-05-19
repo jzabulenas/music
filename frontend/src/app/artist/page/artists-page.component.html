@@ -1,0 +1,11 @@
+<h1>My Artists</h1>
+
+<p class="artist-count">{{ count() }} {{ count() === 1 ? 'artist' : 'artists' }} added</p>
+
+@if (error()) {
+  <p class="error-msg" role="alert">{{ error() }}</p>
+}
+
+<app-artist-input (artistAdded)="onArtistAdded($event)" />
+
+<app-artist-list [artists]="artists()" (deleted)="onArtistDeleted($event)" />

@@ -1,0 +1,15 @@
+form {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.full-width {
+  width: 100%;
+}
+
+.error-msg {
+  color: var(--mat-sys-error);
+  margin: 4px 0 0;
+  font: var(--mat-sys-body-small);
+}
