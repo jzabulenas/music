@@ -1,6 +1,7 @@
 package com.example.demo.saved;
 
 import java.util.List;
+import org.jspecify.annotations.Nullable;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.stereotype.Service;
@@ -29,7 +30,11 @@ class SavedArtistService {
       .toList();
   }
 
-  public SavedArtistResponse save(Long userId, String name, String genre) {
+  public SavedArtistResponse save(
+    Long userId,
+    String name,
+    @Nullable String genre
+  ) {
     try {
       SavedArtist artist = this.repository.save(
         new SavedArtist(userId, name, genre)

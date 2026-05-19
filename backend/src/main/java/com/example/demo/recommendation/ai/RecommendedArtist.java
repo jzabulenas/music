@@ -1,3 +1,9 @@
 package com.example.demo.recommendation.ai;
 
-public record RecommendedArtist(String name, String genre, String reason) {}
+import org.jspecify.annotations.Nullable;
+
+public record RecommendedArtist(
+  String name,
+  @Nullable String genre,
+  @Nullable String reason
+) {}

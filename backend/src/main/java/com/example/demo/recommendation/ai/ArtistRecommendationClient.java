@@ -32,6 +32,16 @@ public class ArtistRecommendationClient {
       .call()
       .entity(RecommendedArtistResponse.class);
 
-    return response.artists();
+    if (response == null) {
+      throw new IllegalStateException("AI client returned null response");
+    }
+
+    List<RecommendedArtist> artists = response.artists();
+
+    if (artists == null) {
+      throw new IllegalStateException("AI client returned null artists");
+    }
+
+    return artists;
   }
 }
