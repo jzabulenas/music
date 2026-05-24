@@ -1,0 +1,10 @@
+.error-msg {
+  color: var(--mat-sys-error);
+  margin-bottom: 16px;
+}
+
+.recommendation-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}

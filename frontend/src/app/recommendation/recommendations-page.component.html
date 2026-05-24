@@ -1,0 +1,21 @@
+<h1>Recommendations</h1>
+
+@if (error()) {
+  <p class="error-msg" role="alert">{{ error() }}</p>
+}
+
+<app-generate-button
+  [artistCount]="artistCount()"
+  [loading]="loading()"
+  (generate)="onGenerate()"
+/>
+
+@if (recommendations().length > 0) {
+  <ul class="recommendation-list">
+    @for (rec of recommendations(); track rec.id) {
+      <li>
+        <app-recommendation-card [recommendation]="rec" (saved)="onSave($event)" />
+      </li>
+    }
+  </ul>
+}
