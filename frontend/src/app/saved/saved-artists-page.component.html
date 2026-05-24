@@ -1,0 +1,17 @@
+<h1>Saved Artists</h1>
+
+@if (error()) {
+  <p class="error-msg" role="alert">{{ error() }}</p>
+}
+
+@if (savedArtists().length === 0) {
+  <app-empty-state />
+} @else {
+  <ul class="saved-list">
+    @for (artist of savedArtists(); track artist.id) {
+      <li>
+        <app-saved-artist-card [savedArtist]="artist" (removed)="onRemove($event)" />
+      </li>
+    }
+  </ul>
+}

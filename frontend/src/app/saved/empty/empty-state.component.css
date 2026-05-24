@@ -1,0 +1,5 @@
+.empty-msg {
+  color: var(--mat-sys-on-surface-variant);
+  font-style: italic;
+  margin-top: 24px;
+}

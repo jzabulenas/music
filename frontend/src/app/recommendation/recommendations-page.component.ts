@@ -8,6 +8,7 @@ import {
 } from '@angular/core';
 import { ArtistService } from '../artist/artist.service';
 import { RecommendationService } from './recommendation.service';
+import { SavedArtistService } from '../saved/saved-artist.service';
 import { GenerateButtonComponent } from './generate/generate-button.component';
 import { RecommendationCardComponent } from './card/recommendation-card.component';
 import { Recommendation } from './recommendation.model';
@@ -22,6 +23,7 @@ import { Recommendation } from './recommendation.model';
 export class RecommendationsPageComponent implements OnInit {
   private readonly artistService = inject(ArtistService);
   private readonly recommendationService = inject(RecommendationService);
+  private readonly savedArtistService = inject(SavedArtistService);
 
   protected readonly artistCount = computed(() => this.artistService.artists().length);
   protected readonly recommendations = this.recommendationService.recommendations;
@@ -52,7 +54,7 @@ export class RecommendationsPageComponent implements OnInit {
   }
 
   protected onSave(recommendation: Recommendation): void {
-    this.recommendationService.save(recommendation.name, recommendation.genre).subscribe({
+    this.savedArtistService.save(recommendation.name, recommendation.genre).subscribe({
       error: () => this.error.set('Failed to save artist.'),
     });
   }
