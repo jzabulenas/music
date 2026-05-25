@@ -18,6 +18,8 @@
 - Use Spring Boot 4
   - Use Spring Framework 7
   - Use Spring Security 7
+- Use JSpecify annotations. Packages must be `@NullMarked` by default
+  - If anything else needs nullability, use `@Nullable`. Handle the nullability
 
 ### JPA
 

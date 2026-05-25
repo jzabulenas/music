@@ -2,6 +2,7 @@ package com.example.demo.saved;
 
 import jakarta.persistence.*;
 import java.time.Instant;
+import org.jspecify.annotations.Nullable;
 
 @Entity
 @Table(name = "saved_artists")
@@ -17,6 +18,7 @@ class SavedArtist {
   @Column(nullable = false)
   private String name;
 
+  @Nullable
   private String genre;
 
   @Column(nullable = false, updatable = false)
@@ -24,7 +26,7 @@ class SavedArtist {
 
   SavedArtist() {}
 
-  SavedArtist(Long userId, String name, String genre) {
+  SavedArtist(Long userId, String name, @Nullable String genre) {
     this.userId = userId;
     this.name = name;
     this.genre = genre;
@@ -39,6 +41,7 @@ class SavedArtist {
     return this.name;
   }
 
+  @Nullable
   String getGenre() {
     return this.genre;
   }

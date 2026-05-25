@@ -1,0 +1,23 @@
+<div class="generate-container">
+  <button
+    mat-raised-button
+    color="primary"
+    class="generate-btn"
+    [disabled]="isDisabled()"
+    [attr.aria-busy]="loading()"
+    (click)="onGenerate()"
+  >
+    @if (loading()) {
+      <mat-spinner diameter="20" aria-label="Generating recommendations" />
+    } @else {
+      Generate recommendations
+    }
+  </button>
+
+  @if (needsMoreArtists()) {
+    <p class="hint">
+      Add {{ remaining() }} more {{ remaining() === 1 ? 'artist' : 'artists' }} to generate
+      recommendations
+    </p>
+  }
+</div>
