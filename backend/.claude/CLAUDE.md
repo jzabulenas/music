@@ -29,3 +29,7 @@
 ## Maven
 
 - Sources exist for all dependencies. Do not decompile .class files when researching
+
+## Tests
+
+- Every test name must be fully backed by its assertion — if the name claims "returnsSameRecs", the body must verify the actual data matches, not just the count
