@@ -7,6 +7,7 @@ import java.time.Instant;
 @Table(name = "liked_artists")
 class LikedArtist {
 
+  @SuppressWarnings("NullAway.Init")
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
@@ -20,6 +21,7 @@ class LikedArtist {
   @Column(nullable = false, updatable = false)
   private Instant addedAt;
 
+  @SuppressWarnings("NullAway.Init")
   LikedArtist() {}
 
   LikedArtist(Long userId, String name) {

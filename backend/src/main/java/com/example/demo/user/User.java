@@ -7,6 +7,7 @@ import java.time.Instant;
 @Table(name = "users")
 public class User {
 
+  @SuppressWarnings("NullAway.Init")
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
@@ -17,6 +18,7 @@ public class User {
   @Column(nullable = false, updatable = false)
   private Instant createdAt;
 
+  @SuppressWarnings("NullAway.Init")
   User() {}
 
   User(String email) {
