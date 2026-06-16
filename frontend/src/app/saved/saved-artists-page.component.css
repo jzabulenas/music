@@ -1,0 +1,9 @@
+.saved-list {
+  list-style: none;
+  margin: 24px 0 0;
+  padding: 0;
+}
+
+.error-msg {
+  color: var(--mat-sys-error);
+}

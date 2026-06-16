@@ -1,0 +1,13 @@
+spring:
+  ai:
+    openai:
+      api-key: test-dummy-key
+  session:
+    jdbc:
+      initialize-schema: always
+
+app:
+  base-url: http://localhost
+  backend-url: http://localhost
+  cors:
+    allowed-origins: http://localhost

@@ -8,6 +8,7 @@ import org.jspecify.annotations.Nullable;
 @Table(name = "saved_artists")
 class SavedArtist {
 
+  @SuppressWarnings("NullAway.Init")
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
@@ -24,6 +25,7 @@ class SavedArtist {
   @Column(nullable = false, updatable = false)
   private Instant savedAt;
 
+  @SuppressWarnings("NullAway.Init")
   SavedArtist() {}
 
   SavedArtist(Long userId, String name, @Nullable String genre) {

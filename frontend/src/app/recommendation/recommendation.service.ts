@@ -21,10 +21,4 @@ export class RecommendationService {
       .post<Recommendation[]>('/api/v1/recommendations/generate', null)
       .pipe(tap((recs) => this.recommendations.set(recs)));
   }
-
-  // `unknown` because I don't need to read what is being returned from
-  // backend
-  save(name: string, genre: string | null): Observable<unknown> {
-    return this.http.post('/api/v1/saved-artists', { name, genre });
-  }
 }

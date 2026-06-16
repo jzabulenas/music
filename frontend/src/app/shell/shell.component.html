@@ -1,0 +1,19 @@
+<mat-toolbar>
+  <span class="brand">MusicDiscover</span>
+
+  <nav aria-label="Main navigation">
+    <a mat-button routerLink="/app/artists" routerLinkActive="active-link">Artists</a>
+    <a mat-button routerLink="/app/recommendations" routerLinkActive="active-link"
+      >Recommendations</a
+    >
+    <a mat-button routerLink="/app/saved" routerLinkActive="active-link">Saved</a>
+  </nav>
+
+  <span class="spacer"></span>
+
+  <button mat-button (click)="logout()">Logout</button>
+</mat-toolbar>
+
+<main>
+  <router-outlet />
+</main>

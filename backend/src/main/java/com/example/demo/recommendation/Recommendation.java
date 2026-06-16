@@ -8,6 +8,7 @@ import org.jspecify.annotations.Nullable;
 @Table(name = "recommendations")
 class Recommendation {
 
+  @SuppressWarnings("NullAway.Init")
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
@@ -28,6 +29,7 @@ class Recommendation {
   @Column(nullable = false, updatable = false)
   private Instant createdAt;
 
+  @SuppressWarnings("NullAway.Init")
   Recommendation() {}
 
   Recommendation(
