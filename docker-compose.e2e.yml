@@ -1,0 +1,42 @@
+services:
+  mariadb:
+    image: mariadb:11
+    environment:
+      MARIADB_ROOT_PASSWORD: root
+      MARIADB_DATABASE: music
+      MARIADB_USER: music
+      MARIADB_PASSWORD: music
+    healthcheck:
+      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
+      start_period: 10s
+      interval: 5s
+      retries: 10
+
+  mailpit:
+    image: axllent/mailpit
+    ports:
+      - "8025:8025"
+
+  backend:
+    build: ./backend
+    ports:
+      - "8080:8080"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mariadb://mariadb:3306/music
+      MARIADB_USERNAME: music
+      MARIADB_PASSWORD: music
+      MAIL_HOST: mailpit
+      SPRING_AI_OPENAI_API_KEY: ${SPRING_AI_OPENAI_API_KEY}
+      APP_BASE_URL: http://localhost:4200
+      APP_BACKEND_URL: http://localhost:8080
+      CORS_ALLOWED_ORIGINS: http://localhost:4200
+    depends_on:
+      mariadb:
+        condition: service_healthy
+      mailpit:
+        condition: service_started
+    healthcheck:
+      test: ["CMD-SHELL", "curl -s http://localhost:8080/error -o /dev/null"]
+      start_period: 30s
+      interval: 5s
+      retries: 12
