@@ -12,6 +12,7 @@
 - If above and below an `if` statement there is variable definition, you must add an empty line above and below the `if` statement
 - Inside of methods, variable definitions should be grouped when it makes sense
 - When writing comments, if you refer to code, encase it with ``
+- Always write comments above a line, not to the right of it
 
 ## Spring
 
