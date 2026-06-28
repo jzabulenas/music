@@ -12,12 +12,12 @@ class E2ESupport {
 
   static final String BASE_URL = System.getenv().getOrDefault(
     "BASE_URL",
-    "http://localhost:8080"
+    "http://localhost:8081"
   );
 
   static final String MAILPIT_URL = System.getenv().getOrDefault(
     "MAILPIT_URL",
-    "http://localhost:8025"
+    "http://localhost:8026"
   );
 
   static String uniqueEmail() {
