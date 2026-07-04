@@ -21,7 +21,7 @@ export default defineConfig({
       name: 'Desktop Chrome',
       use: {
         ...devices['Desktop Chrome'],
-        storageState: 'tests/.auth/user.json',
+        storageState: 'playwright/.auth/user.json',
       },
       dependencies: ['setup'],
       testIgnore: /auth\.spec\.ts/,
@@ -30,7 +30,7 @@ export default defineConfig({
       name: 'Desktop Firefox',
       use: {
         ...devices['Desktop Firefox'],
-        storageState: 'tests/.auth/user.json',
+        storageState: 'playwright/.auth/user.json',
       },
       dependencies: ['setup'],
       testIgnore: /auth\.spec\.ts/,
@@ -39,7 +39,7 @@ export default defineConfig({
       name: 'Desktop Safari',
       use: {
         ...devices['Desktop Safari'],
-        storageState: 'tests/.auth/user.json',
+        storageState: 'playwright/.auth/user.json',
       },
       dependencies: ['setup'],
       testIgnore: /auth\.spec\.ts/,
@@ -48,7 +48,7 @@ export default defineConfig({
       name: 'Mobile Chrome',
       use: {
         ...devices['Pixel 5'],
-        storageState: 'tests/.auth/user.json',
+        storageState: 'playwright/.auth/user.json',
       },
       dependencies: ['setup'],
       testIgnore: /auth\.spec\.ts/,
@@ -57,7 +57,7 @@ export default defineConfig({
       name: 'Mobile Safari',
       use: {
         ...devices['iPhone 12'],
-        storageState: 'tests/.auth/user.json',
+        storageState: 'playwright/.auth/user.json',
       },
       dependencies: ['setup'],
       testIgnore: /auth\.spec\.ts/,
