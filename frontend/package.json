@@ -7,8 +7,8 @@
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
-    "start:e2e": "ng serve --proxy-config proxy.conf.e2e.js",
-    "e2e": "playwright test",
+    "start:e2e": "ng serve --port 4201 --proxy-config proxy.conf.e2e.js",
+    "e2e": "playwright test --trace on",
     "e2e:ui": "playwright test --ui"
   },
   "private": true,
