@@ -1,6 +1,6 @@
 form {
   display: flex;
-  align-items: flex-start;
+  align-items: baseline;
   gap: 8px;
 }
 
