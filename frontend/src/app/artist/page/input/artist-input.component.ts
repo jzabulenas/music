@@ -1,5 +1,5 @@
-import { ChangeDetectionStrategy, Component, inject, output } from '@angular/core';
-import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import { ChangeDetectionStrategy, Component, inject, output, viewChild } from '@angular/core';
+import { FormBuilder, FormGroupDirective, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
@@ -15,6 +15,7 @@ export class ArtistInputComponent {
   artistAdded = output<string>();
 
   private readonly fb = inject(FormBuilder);
+  private readonly formDirective = viewChild.required(FormGroupDirective);
 
   protected form = this.fb.group({
     name: ['', [Validators.required, Validators.maxLength(255)]],
@@ -29,6 +30,6 @@ export class ArtistInputComponent {
     }
 
     this.artistAdded.emit(this.nameControl.value!);
-    this.form.reset();
+    this.formDirective().resetForm();
   }
 }
