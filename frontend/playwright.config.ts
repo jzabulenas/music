@@ -19,53 +19,28 @@ export default defineConfig({
     },
     {
       name: 'Desktop Chrome',
-      use: {
-        ...devices['Desktop Chrome'],
-        storageState: 'playwright/.auth/user.json',
-      },
+      use: { ...devices['Desktop Chrome'], storageState: 'playwright/.auth/user.json' },
       dependencies: ['setup'],
-      testIgnore: /auth\.spec\.ts/,
     },
     {
       name: 'Desktop Firefox',
-      use: {
-        ...devices['Desktop Firefox'],
-        storageState: 'playwright/.auth/user.json',
-      },
+      use: { ...devices['Desktop Firefox'], storageState: 'playwright/.auth/user.json' },
       dependencies: ['setup'],
-      testIgnore: /auth\.spec\.ts/,
     },
     {
       name: 'Desktop Safari',
-      use: {
-        ...devices['Desktop Safari'],
-        storageState: 'playwright/.auth/user.json',
-      },
+      use: { ...devices['Desktop Safari'], storageState: 'playwright/.auth/user.json' },
       dependencies: ['setup'],
-      testIgnore: /auth\.spec\.ts/,
     },
     {
       name: 'Mobile Chrome',
-      use: {
-        ...devices['Pixel 5'],
-        storageState: 'playwright/.auth/user.json',
-      },
+      use: { ...devices['Pixel 5'], storageState: 'playwright/.auth/user.json' },
       dependencies: ['setup'],
-      testIgnore: /auth\.spec\.ts/,
     },
     {
       name: 'Mobile Safari',
-      use: {
-        ...devices['iPhone 12'],
-        storageState: 'playwright/.auth/user.json',
-      },
+      use: { ...devices['iPhone 12'], storageState: 'playwright/.auth/user.json' },
       dependencies: ['setup'],
-      testIgnore: /auth\.spec\.ts/,
-    },
-    {
-      name: 'auth',
-      use: { ...devices['Desktop Chrome'] },
-      testMatch: /auth\.spec\.ts/,
     },
   ],
 
