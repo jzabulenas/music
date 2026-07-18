@@ -3,6 +3,13 @@
   padding: 24px;
   max-width: 800px;
   margin: 0 auto;
+  box-sizing: border-box;
+}
+
+@media (max-width: 600px) {
+  :host {
+    padding: 16px;
+  }
 }
 
 h1 {
