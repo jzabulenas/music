@@ -1,14 +1,10 @@
-import { type Page, expect, test } from '@playwright/test';
+import { expect, test } from '@playwright/test';
 
+import { addArtist } from './helpers/artists';
 import { loginAs } from './helpers/auth';
 
 function uniqueEmail(): string {
   return `artists-${crypto.randomUUID().slice(0, 8)}@e2e.test`;
-}
-
-async function addArtist(page: Page, name: string): Promise<void> {
-  await page.getByLabel('Artist name').fill(name);
-  await page.getByRole('button', { name: 'Add' }).click();
 }
 
 test.beforeEach(async ({ page }) => {
