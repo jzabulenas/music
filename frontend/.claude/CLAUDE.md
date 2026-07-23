@@ -67,3 +67,4 @@
 ## Tests
 
 - Every test name must be fully backed by its assertion — if the name claims "returnsSameRecs", the body must verify the actual data matches, not just the count
+- Each test should be completely isolated from another test and should run independently with its own local storage, session storage, data, cookies etc. Test isolation improves reproducibility, makes debugging easier and prevents cascading test failures.
