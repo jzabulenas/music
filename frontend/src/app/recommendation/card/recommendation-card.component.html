@@ -1,15 +1,15 @@
 <mat-card>
   <mat-card-header>
-    <mat-card-title>{{ recommendation().name }}</mat-card-title>
+    <mat-card-title data-testid="artist-name">{{ recommendation().name }}</mat-card-title>
 
     @if (recommendation().genre) {
-      <mat-card-subtitle>{{ recommendation().genre }}</mat-card-subtitle>
+      <mat-card-subtitle data-testid="artist-genre">{{ recommendation().genre }}</mat-card-subtitle>
     }
   </mat-card-header>
 
   @if (recommendation().reason) {
     <mat-card-content>
-      <p>{{ recommendation().reason }}</p>
+      <p data-testid="reason">{{ recommendation().reason }}</p>
     </mat-card-content>
   }
 

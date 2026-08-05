@@ -2,8 +2,6 @@ import { expect, test } from '@playwright/test';
 
 import { loginAs } from './helpers/auth';
 
-test.use({ storageState: { cookies: [], origins: [] } });
-
 function uniqueEmail(): string {
   return `auth-${crypto.randomUUID().slice(0, 8)}@e2e.test`;
 }

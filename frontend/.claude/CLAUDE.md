@@ -67,3 +67,5 @@
 ## Tests
 
 - Every test name must be fully backed by its assertion — if the name claims "returnsSameRecs", the body must verify the actual data matches, not just the count
+- Automated tests should verify that the application code works for the end users, and avoid relying on implementation details such as things which users will not typically use, see, or even know about such as the name of a function, whether something is an array, or the CSS class of some element. The end user will see or interact with what is rendered on the page, so your test should typically only see/interact with the same rendered output
+- Each test should be completely isolated from another test and should run independently with its own local storage, session storage, data, cookies etc. Test isolation improves reproducibility, makes debugging easier and prevents cascading test failures
