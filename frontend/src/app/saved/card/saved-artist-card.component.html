@@ -1,9 +1,9 @@
 <mat-card>
   <mat-card-header>
-    <mat-card-title>{{ savedArtist().name }}</mat-card-title>
+    <mat-card-title data-testid="artist-name">{{ savedArtist().name }}</mat-card-title>
 
     @if (savedArtist().genre) {
-      <mat-card-subtitle>{{ savedArtist().genre }}</mat-card-subtitle>
+      <mat-card-subtitle data-testid="artist-genre">{{ savedArtist().genre }}</mat-card-subtitle>
     }
   </mat-card-header>
 
