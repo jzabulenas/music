@@ -41,6 +41,9 @@ spring:
           starttls:
             enable: ${MAIL_STARTTLS:false}
 
+  config:
+    import: "optional:configtree:${CREDENTIALS_DIRECTORY}/"
+
 spring-ai:
   openai:
     api-key: ${SPRING_AI_OPENAI_API_KEY}
