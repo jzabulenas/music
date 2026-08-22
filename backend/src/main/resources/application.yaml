@@ -41,17 +41,21 @@ spring:
           starttls:
             enable: ${MAIL_STARTTLS:false}
 
-spring-ai:
-  openai:
-    api-key: ${SPRING_AI_OPENAI_API_KEY}
-    chat:
-      options:
-        model: gpt-4o-mini
-        temperature: 0.8
+  config:
+    import: "optional:configtree:${CREDENTIALS_DIRECTORY}/"
+
+  ai:
+    openai:
+      api-key: ${SPRING_AI_OPENAI_API_KEY}
+      chat:
+        options:
+          model: gpt-4o-mini
+          temperature: 0.8
 
 app:
   base-url: ${APP_BASE_URL:http://localhost:4200}
   backend-url: ${APP_BACKEND_URL:http://localhost:8080}
+  mail-from: ${MAIL_FROM:noreply@music-rec.local}
   cors:
     allowed-origins: ${CORS_ALLOWED_ORIGINS:http://localhost:4200}
 

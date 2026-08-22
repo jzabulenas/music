@@ -9,5 +9,6 @@ spring:
 app:
   base-url: http://localhost
   backend-url: http://localhost
+  mail-from: noreply@music-rec.local
   cors:
     allowed-origins: http://localhost

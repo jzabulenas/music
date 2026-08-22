@@ -22,6 +22,9 @@ class MagicLinkSuccessHandler implements OneTimeTokenGenerationSuccessHandler {
   @Value("${app.base-url}")
   private String baseUrl;
 
+  @Value("${app.mail-from}")
+  private String mailFrom;
+
   MagicLinkSuccessHandler(JavaMailSender mailSender) {
     this.mailSender = mailSender;
   }
@@ -43,7 +46,7 @@ class MagicLinkSuccessHandler implements OneTimeTokenGenerationSuccessHandler {
       MimeMessageHelper helper = new MimeMessageHelper(message, "UTF-8");
 
       helper.setTo(oneTimeToken.getUsername());
-      helper.setFrom("noreply@music-rec.local");
+      helper.setFrom(this.mailFrom);
       helper.setSubject("Your sign-in link");
       helper.setText(
         """
