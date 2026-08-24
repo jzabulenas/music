@@ -84,3 +84,15 @@ test('clicking Save on a recommendation card triggers a success indication', asy
 
   await expect(card.getByRole('button', { name: 'Saved' })).toBeDisabled();
 });
+
+test('clicking "Don\'t suggest again" blocks the artist without removing the card', async ({
+  page,
+}) => {
+  await generateRecommendations(page);
+
+  const card = recommendationCards(page).first();
+  await card.getByRole('button', { name: "Don't suggest again" }).click();
+
+  await expect(card.getByRole('button', { name: "Won't suggest again" })).toBeDisabled();
+  await expect(recommendationCards(page)).toHaveCount(5);
+});
