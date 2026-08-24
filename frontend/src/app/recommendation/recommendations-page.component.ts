@@ -9,6 +9,7 @@ import {
 import { ArtistService } from '../artist/artist.service';
 import { RecommendationService } from './recommendation.service';
 import { SavedArtistService } from '../saved/saved-artist.service';
+import { BlockedArtistService } from '../blocked/blocked-artist.service';
 import { GenerateButtonComponent } from './generate/generate-button.component';
 import { RecommendationCardComponent } from './card/recommendation-card.component';
 import { Recommendation } from './recommendation.model';
@@ -24,6 +25,7 @@ export class RecommendationsPageComponent implements OnInit {
   private readonly artistService = inject(ArtistService);
   private readonly recommendationService = inject(RecommendationService);
   private readonly savedArtistService = inject(SavedArtistService);
+  private readonly blockedArtistService = inject(BlockedArtistService);
 
   protected readonly artistCount = computed(() => this.artistService.artists().length);
   protected readonly recommendations = this.recommendationService.recommendations;
@@ -56,6 +58,12 @@ export class RecommendationsPageComponent implements OnInit {
   protected onSave(recommendation: Recommendation): void {
     this.savedArtistService.save(recommendation.name, recommendation.genre).subscribe({
       error: () => this.error.set('Failed to save artist.'),
+    });
+  }
+
+  protected onBlock(recommendation: Recommendation): void {
+    this.blockedArtistService.block(recommendation.name).subscribe({
+      error: () => this.error.set('Failed to block artist.'),
     });
   }
 }
