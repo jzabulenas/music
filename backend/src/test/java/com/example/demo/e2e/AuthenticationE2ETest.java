@@ -53,7 +53,7 @@ class AuthenticationE2ETest extends E2ESupport {
       .follow(false)
       .post("/logout")
       .then()
-      .statusCode(302);
+      .statusCode(200);
 
     spec.redirects().follow(false).get("/api/v1/me").then().statusCode(302);
   }
