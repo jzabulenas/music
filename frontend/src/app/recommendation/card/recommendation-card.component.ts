@@ -13,11 +13,18 @@ import { Recommendation } from '../recommendation.model';
 export class RecommendationCardComponent {
   recommendation = input.required<Recommendation>();
   saved = output<Recommendation>();
+  blocked = output<Recommendation>();
 
   protected readonly isSaved = signal(false);
+  protected readonly isBlocked = signal(false);
 
   protected onSave(): void {
     this.isSaved.set(true);
     this.saved.emit(this.recommendation());
+  }
+
+  protected onBlock(): void {
+    this.isBlocked.set(true);
+    this.blocked.emit(this.recommendation());
   }
 }
