@@ -13,8 +13,14 @@ public class ArtistRecommendationClient {
     this.chatClient = builder.build();
   }
 
-  public List<RecommendedArtist> recommend(List<String> likedArtists) {
+  public List<RecommendedArtist> recommend(
+    List<String> likedArtists,
+    List<String> blockedArtists
+  ) {
     String artistList = String.join(", ", likedArtists);
+    String rejectedList = blockedArtists.isEmpty()
+      ? "none"
+      : String.join(", ", blockedArtists);
 
     RecommendedArtistResponse response = this.chatClient.prompt()
       .user(u ->
@@ -25,9 +31,11 @@ public class ArtistRecommendationClient {
             Suggest exactly 5 music artists I haven't listed that I'd likely enjoy.
             For each provide: name, primary genre, one-sentence reason why I'd like them.
             Don't repeat any artist from my list.
+            Never suggest any of these artists, as I've already rejected them: {rejected}.
             """
           )
           .param("artists", artistList)
+          .param("rejected", rejectedList)
       )
       .call()
       .entity(RecommendedArtistResponse.class);
