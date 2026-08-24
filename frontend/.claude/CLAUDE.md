@@ -18,7 +18,7 @@
 - Do NOT use the `@HostBinding` and `@HostListener` decorators. Put host bindings inside the `host` object of the `@Component` or `@Directive` decorator instead
 - Use `NgOptimizedImage` for all static images.
   - `NgOptimizedImage` does not work for inline base64 images.
-- When creating components, place and separated them (component, template and css) in logical and connected folder order, such as:
+- When creating components, place and separate them (component, template and css) in logical and connected folder order, such as:
   - `artist`
     - `page`
       - `input`
@@ -38,6 +38,7 @@
 - Do NOT use `ngStyle`, use `style` bindings instead
 - When using external templates/styles, use paths relative to the component TS file.
 - Use `protected` access modifier on methods that are are only used in that component's template. Use `private` access modifier on methods that are only used within that TS class
+- Prefer naming event handlers for the action they perform rather than for the triggering event. Example: `<button (click)="saveUserData()">Save</button>`
 
 ### State Management
 
