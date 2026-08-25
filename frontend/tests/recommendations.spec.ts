@@ -96,3 +96,19 @@ test('clicking "Don\'t suggest again" blocks the artist without removing the car
   await expect(card.getByRole('button', { name: "Won't suggest again" })).toBeDisabled();
   await expect(recommendationCards(page)).toHaveCount(5);
 });
+
+test('a blocked artist still shows "Won\'t suggest again" after reloading the page', async ({
+  page,
+}) => {
+  await generateRecommendations(page);
+
+  const card = recommendationCards(page).first();
+  const artistName = await card.getByTestId('artist-name').textContent();
+  await card.getByRole('button', { name: "Don't suggest again" }).click();
+  await expect(card.getByRole('button', { name: "Won't suggest again" })).toBeDisabled();
+
+  await page.reload();
+
+  const cardAfterReload = recommendationCards(page).filter({ hasText: artistName ?? '' });
+  await expect(cardAfterReload.getByRole('button', { name: "Won't suggest again" })).toBeDisabled();
+});
