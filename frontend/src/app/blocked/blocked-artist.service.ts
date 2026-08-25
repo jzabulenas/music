@@ -9,4 +9,8 @@ export class BlockedArtistService {
   block(name: string): Observable<void> {
     return this.http.post<void>('/api/v1/blocked-artists', { name });
   }
+
+  list(): Observable<string[]> {
+    return this.http.get<string[]>('/api/v1/blocked-artists');
+  }
 }
