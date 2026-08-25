@@ -16,6 +16,7 @@
       <li>
         <app-recommendation-card
           [recommendation]="rec"
+          [alreadySaved]="savedArtistNames().has(rec.name)"
           [alreadyBlocked]="blockedArtistNames().has(rec.name)"
           (saved)="onSave($event)"
           (blocked)="onBlock($event)"

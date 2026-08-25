@@ -32,6 +32,9 @@ export class RecommendationsPageComponent implements OnInit {
   protected readonly loading = signal(false);
   protected readonly error = signal<string | null>(null);
   protected readonly blockedArtistNames = signal<ReadonlySet<string>>(new Set());
+  protected readonly savedArtistNames = computed(
+    () => new Set(this.savedArtistService.savedArtists().map((artist) => artist.name))
+  );
 
   ngOnInit(): void {
     this.artistService.load().subscribe({
@@ -40,6 +43,10 @@ export class RecommendationsPageComponent implements OnInit {
 
     this.recommendationService.load().subscribe({
       error: () => this.error.set('Failed to load recommendations.'),
+    });
+
+    this.savedArtistService.load().subscribe({
+      error: () => this.error.set('Failed to load saved artists.'),
     });
 
     this.blockedArtistService.list().subscribe({
