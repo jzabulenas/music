@@ -1,10 +1,12 @@
 package com.example.demo.e2e;
 
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.anyOf;
 import static org.hamcrest.Matchers.emptyOrNullString;
 import static org.hamcrest.Matchers.emptyString;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.everyItem;
+import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.nullValue;
@@ -79,6 +81,41 @@ class RecommendationE2ETest extends E2ESupport {
       .statusCode(200)
       .body("id", equalTo(secondIds))
       .body("id", not(equalTo(firstIds)));
+  }
+
+  @Test
+  void generateRecommendations_afterBlockingArtist_neverSuggestsItAgain() {
+    RequestSpecification spec = login(uniqueEmail());
+    addLikedArtists(spec, "Radiohead", "Portishead", "Massive Attack");
+
+    List<String> firstNames = spec
+      .post("/api/v1/recommendations/generate")
+      .then()
+      .statusCode(200)
+      .extract()
+      .jsonPath()
+      .getList("name", String.class);
+    String blocked = firstNames.get(0);
+
+    spec
+      .body(
+        """
+        {"name": "%s"}
+        """.formatted(blocked)
+      )
+      .post("/api/v1/blocked-artists")
+      .then()
+      .statusCode(204);
+
+    List<String> secondNames = spec
+      .post("/api/v1/recommendations/generate")
+      .then()
+      .statusCode(200)
+      .extract()
+      .jsonPath()
+      .getList("name", String.class);
+
+    assertThat(secondNames, not(hasItem(blocked)));
   }
 
   @Test

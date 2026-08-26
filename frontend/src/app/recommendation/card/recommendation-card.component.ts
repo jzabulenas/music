@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, input, output, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, input, linkedSignal, output } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { Recommendation } from '../recommendation.model';
@@ -12,12 +12,23 @@ import { Recommendation } from '../recommendation.model';
 })
 export class RecommendationCardComponent {
   recommendation = input.required<Recommendation>();
+  alreadySaved = input(false);
+  alreadyBlocked = input(false);
   saved = output<Recommendation>();
+  blocked = output<Recommendation>();
 
-  protected readonly isSaved = signal(false);
+  // Both derived from their `already*` input on each load, but stay locally
+  // overridable so clicking a button flips it immediately without waiting for a reload.
+  protected readonly isSaved = linkedSignal(() => this.alreadySaved());
+  protected readonly isBlocked = linkedSignal(() => this.alreadyBlocked());
 
   protected onSave(): void {
     this.isSaved.set(true);
     this.saved.emit(this.recommendation());
+  }
+
+  protected onBlock(): void {
+    this.isBlocked.set(true);
+    this.blocked.emit(this.recommendation());
   }
 }

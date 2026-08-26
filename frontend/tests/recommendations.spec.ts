@@ -84,3 +84,45 @@ test('clicking Save on a recommendation card triggers a success indication', asy
 
   await expect(card.getByRole('button', { name: 'Saved' })).toBeDisabled();
 });
+
+test('clicking "Don\'t suggest again" blocks the artist without removing the card', async ({
+  page,
+}) => {
+  await generateRecommendations(page);
+
+  const card = recommendationCards(page).first();
+  await card.getByRole('button', { name: "Don't suggest again" }).click();
+
+  await expect(card.getByRole('button', { name: "Won't suggest again" })).toBeDisabled();
+  await expect(recommendationCards(page)).toHaveCount(5);
+});
+
+test('a blocked artist still shows "Won\'t suggest again" after reloading the page', async ({
+  page,
+}) => {
+  await generateRecommendations(page);
+
+  const card = recommendationCards(page).first();
+  const artistName = await card.getByTestId('artist-name').textContent();
+  await card.getByRole('button', { name: "Don't suggest again" }).click();
+  await expect(card.getByRole('button', { name: "Won't suggest again" })).toBeDisabled();
+
+  await page.reload();
+
+  const cardAfterReload = recommendationCards(page).filter({ hasText: artistName ?? '' });
+  await expect(cardAfterReload.getByRole('button', { name: "Won't suggest again" })).toBeDisabled();
+});
+
+test('a saved artist still shows "Saved" after reloading the page', async ({ page }) => {
+  await generateRecommendations(page);
+
+  const card = recommendationCards(page).first();
+  const artistName = await card.getByTestId('artist-name').textContent();
+  await card.getByRole('button', { name: 'Save for later' }).click();
+  await expect(card.getByRole('button', { name: 'Saved' })).toBeDisabled();
+
+  await page.reload();
+
+  const cardAfterReload = recommendationCards(page).filter({ hasText: artistName ?? '' });
+  await expect(cardAfterReload.getByRole('button', { name: 'Saved' })).toBeDisabled();
+});

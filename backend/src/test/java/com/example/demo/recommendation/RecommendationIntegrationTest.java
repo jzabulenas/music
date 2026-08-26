@@ -21,7 +21,7 @@ class RecommendationIntegrationTest extends BaseIntegrationTest {
 
   @BeforeEach
   void stubAiClient() {
-    when(this.recommendationClient.recommend(any())).thenReturn(
+    when(this.recommendationClient.recommend(any(), any())).thenReturn(
       List.of(
         new RecommendedArtist("Artist 1", "Rock", "Reason 1"),
         new RecommendedArtist("Artist 2", "Jazz", "Reason 2"),
@@ -83,7 +83,7 @@ class RecommendationIntegrationTest extends BaseIntegrationTest {
 
     spec.post("/api/v1/recommendations/generate");
 
-    when(this.recommendationClient.recommend(any())).thenReturn(
+    when(this.recommendationClient.recommend(any(), any())).thenReturn(
       List.of(
         new RecommendedArtist("New Artist 1", "Rock", "New Reason 1"),
         new RecommendedArtist("New Artist 2", "Jazz", "New Reason 2"),
