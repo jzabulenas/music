@@ -9,7 +9,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
 @Service
-class SavedArtistService {
+public class SavedArtistService {
 
   private final SavedArtistRepository repository;
 
@@ -59,5 +59,12 @@ class SavedArtistService {
   @Transactional
   public void delete(Long id, Long userId) {
     this.repository.deleteByIdAndUserId(id, userId);
+  }
+
+  public List<String> getNames(Long userId) {
+    return this.repository.findByUserId(userId)
+      .stream()
+      .map(SavedArtist::getName)
+      .toList();
   }
 }
