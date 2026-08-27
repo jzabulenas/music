@@ -119,6 +119,41 @@ class RecommendationE2ETest extends E2ESupport {
   }
 
   @Test
+  void generateRecommendations_afterSavingArtist_neverSuggestsItAgain() {
+    RequestSpecification spec = login(uniqueEmail());
+    addLikedArtists(spec, "Radiohead", "Portishead", "Massive Attack");
+
+    List<String> firstNames = spec
+      .post("/api/v1/recommendations/generate")
+      .then()
+      .statusCode(200)
+      .extract()
+      .jsonPath()
+      .getList("name", String.class);
+    String saved = firstNames.get(0);
+
+    spec
+      .body(
+        """
+        {"name": "%s"}
+        """.formatted(saved)
+      )
+      .post("/api/v1/saved-artists")
+      .then()
+      .statusCode(201);
+
+    List<String> secondNames = spec
+      .post("/api/v1/recommendations/generate")
+      .then()
+      .statusCode(200)
+      .extract()
+      .jsonPath()
+      .getList("name", String.class);
+
+    assertThat(secondNames, not(hasItem(saved)));
+  }
+
+  @Test
   void generate_withFewerThanThreeLikedArtists_returns422() {
     RequestSpecification spec = login(uniqueEmail());
     addLikedArtists(spec, "Radiohead", "Portishead");
