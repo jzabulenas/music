@@ -15,12 +15,16 @@ public class ArtistRecommendationClient {
 
   public List<RecommendedArtist> recommend(
     List<String> likedArtists,
-    List<String> blockedArtists
+    List<String> blockedArtists,
+    List<String> savedArtists
   ) {
     String artistList = String.join(", ", likedArtists);
     String rejectedList = blockedArtists.isEmpty()
       ? "none"
       : String.join(", ", blockedArtists);
+    String savedList = savedArtists.isEmpty()
+      ? "none"
+      : String.join(", ", savedArtists);
 
     RecommendedArtistResponse response = this.chatClient.prompt()
       .user(u ->
@@ -32,10 +36,12 @@ public class ArtistRecommendationClient {
             For each provide: name, primary genre, one-sentence reason why I'd like them.
             Don't repeat any artist from my list.
             Never suggest any of these artists, as I've already rejected them: {rejected}.
+            Never suggest any of these artists either, as I've already saved them for later: {saved}.
             """
           )
           .param("artists", artistList)
           .param("rejected", rejectedList)
+          .param("saved", savedList)
       )
       .call()
       .entity(RecommendedArtistResponse.class);
