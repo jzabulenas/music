@@ -17,5 +17,9 @@
     <button mat-button [disabled]="isSaved()" (click)="onSave()">
       {{ isSaved() ? 'Saved' : 'Save for later' }}
     </button>
+
+    <button mat-button [disabled]="isBlocked()" (click)="onBlock()">
+      {{ isBlocked() ? "Won't suggest again" : "Don't suggest again" }}
+    </button>
   </mat-card-actions>
 </mat-card>

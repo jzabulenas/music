@@ -14,7 +14,13 @@
   <ul class="recommendation-list">
     @for (rec of recommendations(); track rec.id) {
       <li>
-        <app-recommendation-card [recommendation]="rec" (saved)="onSave($event)" />
+        <app-recommendation-card
+          [recommendation]="rec"
+          [alreadySaved]="savedArtistNames().has(rec.name)"
+          [alreadyBlocked]="blockedArtistNames().has(rec.name)"
+          (saved)="onSave($event)"
+          (blocked)="onBlock($event)"
+        />
       </li>
     }
   </ul>
