@@ -161,7 +161,7 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
-				<version>3.15.0</version>
+				<version>3.16.0</version>
 				<configuration>
 					<release>21</release>
 					<encoding>UTF-8</encoding>
@@ -191,7 +191,7 @@
 						<path>
 							<groupId>com.uber.nullaway</groupId>
 							<artifactId>nullaway</artifactId>
-							<version>0.14.0</version>
+							<version>0.14.1</version>
 						</path>
 					</annotationProcessorPaths>
 				</configuration>

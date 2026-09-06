@@ -26,10 +26,10 @@
     "tslib": "^2.8.1"
   },
   "devDependencies": {
-    "@angular/build": "^21.2.22",
-    "@angular/cli": "^21.2.22",
+    "@angular/build": "^21.2.23",
+    "@angular/cli": "^21.2.23",
     "@angular/compiler-cli": "^21.2.22",
-    "@playwright/test": "^1.62.1",
+    "@playwright/test": "^1.63.0",
     "@types/node": "^26.4.1",
     "jsdom": "^28.1.0",
     "prettier": "^3.9.6",
