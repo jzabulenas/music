@@ -6,7 +6,9 @@ import {
   OnInit,
   signal,
 } from '@angular/core';
+import { HttpErrorResponse } from '@angular/common/http';
 import { ArtistService } from '../artist/artist.service';
+import { AuthService } from '../core/auth.service';
 import { RecommendationService } from './recommendation.service';
 import { SavedArtistService } from '../saved/saved-artist.service';
 import { BlockedArtistService } from '../blocked/blocked-artist.service';
@@ -26,6 +28,7 @@ export class RecommendationsPageComponent implements OnInit {
   private readonly recommendationService = inject(RecommendationService);
   private readonly savedArtistService = inject(SavedArtistService);
   private readonly blockedArtistService = inject(BlockedArtistService);
+  private readonly authService = inject(AuthService);
 
   protected readonly artistCount = computed(() => this.artistService.artists().length);
   protected readonly recommendations = this.recommendationService.recommendations;
@@ -33,7 +36,10 @@ export class RecommendationsPageComponent implements OnInit {
   protected readonly error = signal<string | null>(null);
   protected readonly blockedArtistNames = signal<ReadonlySet<string>>(new Set());
   protected readonly savedArtistNames = computed(
-    () => new Set(this.savedArtistService.savedArtists().map((artist) => artist.name))
+    () => new Set(this.savedArtistService.savedArtists().map((artist) => artist.name)),
+  );
+  protected readonly remainingRequests = computed(
+    () => this.authService.currentUser()?.remainingRequests ?? null,
   );
 
   ngOnInit(): void {
@@ -60,8 +66,13 @@ export class RecommendationsPageComponent implements OnInit {
     this.error.set(null);
 
     this.recommendationService.generate().subscribe({
-      error: () => {
-        this.error.set('Failed to generate recommendations.');
+      next: () => this.authService.fetchCurrentUser().subscribe(),
+      error: (httpError: HttpErrorResponse) => {
+        this.error.set(
+          httpError.status === 429
+            ? 'Daily generation limit reached. Try again tomorrow.'
+            : 'Failed to generate recommendations.',
+        );
         this.loading.set(false);
       },
       complete: () => this.loading.set(false),
@@ -77,9 +88,7 @@ export class RecommendationsPageComponent implements OnInit {
   protected onBlock(recommendation: Recommendation): void {
     this.blockedArtistService.block(recommendation.name).subscribe({
       next: () =>
-        this.blockedArtistNames.update(
-          (names) => new Set([...names, recommendation.name])
-        ),
+        this.blockedArtistNames.update((names) => new Set([...names, recommendation.name])),
       error: () => this.error.set('Failed to block artist.'),
     });
   }

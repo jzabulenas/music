@@ -5,6 +5,8 @@ import com.example.demo.blocked.BlockedArtistService;
 import com.example.demo.recommendation.ai.ArtistRecommendationClient;
 import com.example.demo.recommendation.ai.RecommendedArtist;
 import com.example.demo.saved.SavedArtistService;
+import com.example.demo.user.GenerationQuotaService;
+import com.example.demo.user.User;
 import java.util.List;
 import java.util.Locale;
 import java.util.Set;
@@ -23,23 +25,27 @@ class RecommendationService {
   private final BlockedArtistService blockedArtistService;
   private final SavedArtistService savedArtistService;
   private final ArtistRecommendationClient aiClient;
+  private final GenerationQuotaService quotaService;
 
   RecommendationService(
     RecommendationRepository repository,
     LikedArtistService likedArtistService,
     BlockedArtistService blockedArtistService,
     SavedArtistService savedArtistService,
-    ArtistRecommendationClient aiClient
+    ArtistRecommendationClient aiClient,
+    GenerationQuotaService quotaService
   ) {
     this.repository = repository;
     this.likedArtistService = likedArtistService;
     this.blockedArtistService = blockedArtistService;
     this.savedArtistService = savedArtistService;
     this.aiClient = aiClient;
+    this.quotaService = quotaService;
   }
 
   List<RecommendationResponse> getAll(Long userId) {
-    return this.repository.findByUserId(userId)
+    return this.repository
+      .findByUserId(userId)
       .stream()
       .map(r ->
         new RecommendationResponse(
@@ -53,7 +59,8 @@ class RecommendationService {
   }
 
   @Transactional
-  public List<RecommendationResponse> generate(Long userId) {
+  public List<RecommendationResponse> generate(User user) {
+    Long userId = user.getId();
     List<String> names = this.likedArtistService.getNames(userId);
 
     if (names.size() < 3) {
@@ -63,11 +70,21 @@ class RecommendationService {
       );
     }
 
+    // Enforce the daily quota before spending an AI call.
+    this.quotaService.assertWithinDailyLimit(user);
+
     List<String> blockedNames = this.blockedArtistService.getNames(userId);
     List<String> savedNames = this.savedArtistService.getNames(userId);
-    List<RecommendedArtist> suggested = this.aiClient.recommend(names, blockedNames, savedNames);
+    List<RecommendedArtist> suggested = this.aiClient.recommend(
+      names,
+      blockedNames,
+      savedNames
+    );
 
-    Set<String> excludedLower = Stream.concat(blockedNames.stream(), savedNames.stream())
+    Set<String> excludedLower = Stream.concat(
+      blockedNames.stream(),
+      savedNames.stream()
+    )
       .map(n -> n.toLowerCase(Locale.ROOT))
       .collect(Collectors.toSet());
 
@@ -86,6 +103,9 @@ class RecommendationService {
         .map(r -> new Recommendation(userId, r.name(), r.genre(), r.reason()))
         .toList()
     );
+
+    // Record the successful generation so it counts against the daily quota.
+    this.quotaService.recordGeneration(userId);
 
     return saved
       .stream()

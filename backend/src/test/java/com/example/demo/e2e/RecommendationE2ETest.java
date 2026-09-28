@@ -168,21 +168,4 @@ class RecommendationE2ETest extends E2ESupport {
       .then()
       .statusCode(302);
   }
-
-  private static void addLikedArtists(
-    RequestSpecification spec,
-    String... names
-  ) {
-    for (String name : names) {
-      spec
-        .body(
-          """
-          {"name": "%s"}
-          """.formatted(name)
-        )
-        .post("/api/v1/liked-artists")
-        .then()
-        .statusCode(201);
-    }
-  }
 }
