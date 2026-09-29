@@ -154,6 +154,48 @@ class RecommendationE2ETest extends E2ESupport {
   }
 
   @Test
+  void generateRecommendations_afterRemovingSavedArtist_neverSuggestsItAgain() {
+    RequestSpecification spec = login(uniqueEmail());
+    addLikedArtists(spec, "Radiohead", "Portishead", "Massive Attack");
+
+    List<String> firstNames = spec
+      .post("/api/v1/recommendations/generate")
+      .then()
+      .statusCode(200)
+      .extract()
+      .jsonPath()
+      .getList("name", String.class);
+    String removed = firstNames.get(0);
+
+    int savedId = spec
+      .body(
+        """
+        {"name": "%s"}
+        """.formatted(removed)
+      )
+      .post("/api/v1/saved-artists")
+      .then()
+      .statusCode(201)
+      .extract()
+      .path("id");
+
+    spec
+      .delete("/api/v1/saved-artists/" + savedId)
+      .then()
+      .statusCode(204);
+
+    List<String> secondNames = spec
+      .post("/api/v1/recommendations/generate")
+      .then()
+      .statusCode(200)
+      .extract()
+      .jsonPath()
+      .getList("name", String.class);
+
+    assertThat(secondNames, not(hasItem(removed)));
+  }
+
+  @Test
   void generate_withFewerThanThreeLikedArtists_returns422() {
     RequestSpecification spec = login(uniqueEmail());
     addLikedArtists(spec, "Radiohead", "Portishead");

@@ -83,6 +83,45 @@ class SavedArtistE2ETest extends E2ESupport {
   }
 
   @Test
+  void deleteUnknownId_returns204() {
+    RequestSpecification spec = login(uniqueEmail());
+
+    spec.delete("/api/v1/saved-artists/999999").then().statusCode(204);
+  }
+
+  @Test
+  void removeArtist_thenSaveSameArtistAgain_isAccepted() {
+    RequestSpecification spec = login(uniqueEmail());
+
+    int id = spec
+      .body(
+        """
+        {"name": "Portishead"}
+        """
+      )
+      .post("/api/v1/saved-artists")
+      .then()
+      .statusCode(201)
+      .extract()
+      .path("id");
+
+    spec
+      .delete("/api/v1/saved-artists/" + id)
+      .then()
+      .statusCode(204);
+
+    spec
+      .body(
+        """
+        {"name": "Portishead"}
+        """
+      )
+      .post("/api/v1/saved-artists")
+      .then()
+      .statusCode(201);
+  }
+
+  @Test
   void addDuplicateArtist_returns409() {
     RequestSpecification spec = login(uniqueEmail());
 

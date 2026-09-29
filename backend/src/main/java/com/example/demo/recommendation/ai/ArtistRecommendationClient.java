@@ -15,18 +15,19 @@ public class ArtistRecommendationClient {
 
   public List<RecommendedArtist> recommend(
     List<String> likedArtists,
-    List<String> blockedArtists,
+    List<String> rejectedArtists,
     List<String> savedArtists
   ) {
     String artistList = String.join(", ", likedArtists);
-    String rejectedList = blockedArtists.isEmpty()
+    String rejectedList = rejectedArtists.isEmpty()
       ? "none"
-      : String.join(", ", blockedArtists);
+      : String.join(", ", rejectedArtists);
     String savedList = savedArtists.isEmpty()
       ? "none"
       : String.join(", ", savedArtists);
 
-    RecommendedArtistResponse response = this.chatClient.prompt()
+    RecommendedArtistResponse response = this.chatClient
+      .prompt()
       .user(u ->
         u
           .text(

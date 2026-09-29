@@ -1,6 +1,8 @@
 package com.example.demo.saved;
 
+import com.example.demo.dismissed.DismissedArtistService;
 import java.util.List;
+import java.util.Optional;
 import org.jspecify.annotations.Nullable;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatusCode;
@@ -12,13 +14,19 @@ import org.springframework.web.server.ResponseStatusException;
 public class SavedArtistService {
 
   private final SavedArtistRepository repository;
+  private final DismissedArtistService dismissedArtistService;
 
-  SavedArtistService(SavedArtistRepository repository) {
+  SavedArtistService(
+    SavedArtistRepository repository,
+    DismissedArtistService dismissedArtistService
+  ) {
     this.repository = repository;
+    this.dismissedArtistService = dismissedArtistService;
   }
 
   public List<SavedArtistResponse> findAll(Long userId) {
-    return this.repository.findByUserId(userId)
+    return this.repository
+      .findByUserId(userId)
       .stream()
       .map(a ->
         new SavedArtistResponse(
@@ -56,13 +64,27 @@ public class SavedArtistService {
   }
 
   // `deleteByIdAndUserId` uses `em.remove()` internally, which requires an active transaction.
+  // Removing an artist also dismisses it, so it is never suggested in future generations.
   @Transactional
   public void delete(Long id, Long userId) {
+    Optional<SavedArtist> artist = this.repository.findByIdAndUserId(
+      id,
+      userId
+    );
+
+    // Defensive: an unknown id, or one owned by another user, is a no-op rather than an error.
+    if (artist.isEmpty()) {
+      return;
+    }
+
+    this.dismissedArtistService.dismiss(userId, artist.get().getName());
+
     this.repository.deleteByIdAndUserId(id, userId);
   }
 
   public List<String> getNames(Long userId) {
-    return this.repository.findByUserId(userId)
+    return this.repository
+      .findByUserId(userId)
       .stream()
       .map(SavedArtist::getName)
       .toList();

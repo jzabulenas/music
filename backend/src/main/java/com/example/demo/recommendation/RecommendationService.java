@@ -2,6 +2,7 @@ package com.example.demo.recommendation;
 
 import com.example.demo.artist.LikedArtistService;
 import com.example.demo.blocked.BlockedArtistService;
+import com.example.demo.dismissed.DismissedArtistService;
 import com.example.demo.recommendation.ai.ArtistRecommendationClient;
 import com.example.demo.recommendation.ai.RecommendedArtist;
 import com.example.demo.saved.SavedArtistService;
@@ -23,6 +24,7 @@ class RecommendationService {
   private final RecommendationRepository repository;
   private final LikedArtistService likedArtistService;
   private final BlockedArtistService blockedArtistService;
+  private final DismissedArtistService dismissedArtistService;
   private final SavedArtistService savedArtistService;
   private final ArtistRecommendationClient aiClient;
   private final GenerationQuotaService quotaService;
@@ -31,6 +33,7 @@ class RecommendationService {
     RecommendationRepository repository,
     LikedArtistService likedArtistService,
     BlockedArtistService blockedArtistService,
+    DismissedArtistService dismissedArtistService,
     SavedArtistService savedArtistService,
     ArtistRecommendationClient aiClient,
     GenerationQuotaService quotaService
@@ -38,6 +41,7 @@ class RecommendationService {
     this.repository = repository;
     this.likedArtistService = likedArtistService;
     this.blockedArtistService = blockedArtistService;
+    this.dismissedArtistService = dismissedArtistService;
     this.savedArtistService = savedArtistService;
     this.aiClient = aiClient;
     this.quotaService = quotaService;
@@ -74,21 +78,31 @@ class RecommendationService {
     this.quotaService.assertWithinDailyLimit(user);
 
     List<String> blockedNames = this.blockedArtistService.getNames(userId);
+    List<String> dismissedNames = this.dismissedArtistService.getNames(userId);
     List<String> savedNames = this.savedArtistService.getNames(userId);
+
+    // Blocked and dismissed artists mean the same thing to the model: already rejected.
+    List<String> rejectedNames = Stream.concat(
+      blockedNames.stream(),
+      dismissedNames.stream()
+    ).toList();
+
     List<RecommendedArtist> suggested = this.aiClient.recommend(
       names,
-      blockedNames,
+      rejectedNames,
       savedNames
     );
 
-    Set<String> excludedLower = Stream.concat(
-      blockedNames.stream(),
-      savedNames.stream()
+    Set<String> excludedLower = Stream.of(
+      blockedNames,
+      dismissedNames,
+      savedNames
     )
+      .flatMap(List::stream)
       .map(n -> n.toLowerCase(Locale.ROOT))
       .collect(Collectors.toSet());
 
-    // Defensive safety net: the prompt already asks the model to avoid blocked/saved artists,
+    // Defensive safety net: the prompt already asks the model to avoid rejected or saved artists,
     // but drop any it suggests anyway rather than reintroduce something already rejected or saved.
     List<RecommendedArtist> filtered = suggested
       .stream()

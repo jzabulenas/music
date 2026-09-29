@@ -50,3 +50,29 @@ test('removing a saved artist removes it from the list and shows the empty state
   await expect(page.getByTestId('artist-name').filter({ hasText: artistName })).not.toBeVisible();
   await expect(page.getByText(EMPTY_STATE_MESSAGE)).toBeVisible();
 });
+
+test('a removed saved artist is not suggested in the next generation', async ({ page }) => {
+  test.setTimeout(90_000);
+
+  await generateRecommendations(page);
+
+  const card = recommendationCards(page).first();
+  const artistName = await card.getByTestId('artist-name').innerText();
+  await card.getByRole('button', { name: 'Save for later' }).click();
+
+  await page.goto('/app/saved');
+  await page.getByRole('button', { name: 'Remove' }).click();
+  await expect(page.getByText(EMPTY_STATE_MESSAGE)).toBeVisible();
+
+  await page.goto('/app/recommendations');
+  const generation = page.waitForResponse(
+    (response) =>
+      response.url().endsWith('/api/v1/recommendations/generate') &&
+      response.request().method() === 'POST',
+  );
+  await page.getByRole('button', { name: 'Generate recommendations' }).click();
+  await generation;
+
+  await expect(recommendationCards(page)).toHaveCount(5);
+  await expect(recommendationCards(page).filter({ hasText: artistName })).toHaveCount(0);
+});
