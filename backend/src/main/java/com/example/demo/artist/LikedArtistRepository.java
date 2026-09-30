@@ -6,5 +6,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 interface LikedArtistRepository extends JpaRepository<LikedArtist, Long> {
   List<LikedArtist> findByUserId(Long userId);
 
+  boolean existsByUserIdAndName(Long userId, String name);
+
   void deleteByIdAndUserId(Long id, Long userId);
 }

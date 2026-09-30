@@ -27,4 +27,10 @@ export class SavedArtistService {
       .delete<void>(`/api/v1/saved-artists/${id}`)
       .pipe(tap(() => this.savedArtists.update((list) => list.filter((a) => a.id !== id))));
   }
+
+  like(id: number): Observable<void> {
+    return this.http
+      .post<void>(`/api/v1/saved-artists/${id}/like`, null)
+      .pipe(tap(() => this.savedArtists.update((list) => list.filter((a) => a.id !== id))));
+  }
 }

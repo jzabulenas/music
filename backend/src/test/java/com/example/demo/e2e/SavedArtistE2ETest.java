@@ -1,11 +1,15 @@
 package com.example.demo.e2e;
 
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.nullValue;
 
 import io.restassured.specification.RequestSpecification;
+import java.util.List;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 
@@ -144,5 +148,117 @@ class SavedArtistE2ETest extends E2ESupport {
       .post("/api/v1/saved-artists")
       .then()
       .statusCode(409);
+  }
+
+  @Test
+  void likeSavedArtist_addsItToLikedArtists_andRemovesItFromSaved() {
+    RequestSpecification spec = login(uniqueEmail());
+
+    int id = spec
+      .body(
+        """
+        {"name": "Portishead"}
+        """
+      )
+      .post("/api/v1/saved-artists")
+      .then()
+      .statusCode(201)
+      .extract()
+      .path("id");
+
+    spec
+      .post("/api/v1/saved-artists/" + id + "/like")
+      .then()
+      .statusCode(204);
+
+    spec.get("/api/v1/saved-artists").then().statusCode(200).body("$", empty());
+
+    spec
+      .get("/api/v1/liked-artists")
+      .then()
+      .statusCode(200)
+      .body("$", hasSize(1))
+      .body("[0].name", equalTo("Portishead"));
+  }
+
+  @Test
+  void likeSavedArtist_alreadyLiked_isStillASuccess_andDoesNotDuplicateIt() {
+    RequestSpecification spec = login(uniqueEmail());
+
+    addLikedArtists(spec, "Portishead");
+
+    int id = spec
+      .body(
+        """
+        {"name": "Portishead"}
+        """
+      )
+      .post("/api/v1/saved-artists")
+      .then()
+      .statusCode(201)
+      .extract()
+      .path("id");
+
+    spec
+      .post("/api/v1/saved-artists/" + id + "/like")
+      .then()
+      .statusCode(204);
+
+    spec.get("/api/v1/saved-artists").then().statusCode(200).body("$", empty());
+
+    spec
+      .get("/api/v1/liked-artists")
+      .then()
+      .statusCode(200)
+      .body("$", hasSize(1))
+      .body("[0].name", equalTo("Portishead"));
+  }
+
+  @Test
+  void likeUnknownId_returns204() {
+    RequestSpecification spec = login(uniqueEmail());
+
+    spec.post("/api/v1/saved-artists/999999/like").then().statusCode(204);
+  }
+
+  @Test
+  void likedSavedArtists_seedTheNextGeneration_andAreNeverSuggested() {
+    RequestSpecification spec = login(uniqueEmail());
+
+    // Liking is the only way this user's liked list gets populated, so a successful
+    // generation proves the liked saved artists became the seeds.
+    for (String name : List.of("Radiohead", "Portishead", "Massive Attack")) {
+      int id = spec
+        .body(
+          """
+          {"name": "%s"}
+          """.formatted(name)
+        )
+        .post("/api/v1/saved-artists")
+        .then()
+        .statusCode(201)
+        .extract()
+        .path("id");
+
+      spec
+        .post("/api/v1/saved-artists/" + id + "/like")
+        .then()
+        .statusCode(204);
+    }
+
+    spec.get("/api/v1/saved-artists").then().statusCode(200).body("$", empty());
+
+    List<String> names = spec
+      .post("/api/v1/recommendations/generate")
+      .then()
+      .statusCode(200)
+      .body("$", hasSize(5))
+      .extract()
+      .jsonPath()
+      .getList("name", String.class);
+
+    assertThat(names, not(hasItem("Radiohead")));
+    assertThat(names, not(hasItem("Portishead")));
+    assertThat(names, not(hasItem("Massive Attack")));
   }
 }

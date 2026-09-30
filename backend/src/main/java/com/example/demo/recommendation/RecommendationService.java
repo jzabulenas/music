@@ -94,6 +94,7 @@ class RecommendationService {
     );
 
     Set<String> excludedLower = Stream.of(
+      names,
       blockedNames,
       dismissedNames,
       savedNames
@@ -102,8 +103,11 @@ class RecommendationService {
       .map(n -> n.toLowerCase(Locale.ROOT))
       .collect(Collectors.toSet());
 
-    // Defensive safety net: the prompt already asks the model to avoid rejected or saved artists,
-    // but drop any it suggests anyway rather than reintroduce something already rejected or saved.
+    // Defensive safety net: the prompt already asks the model to avoid liked, rejected or
+    // saved artists, but drop any it suggests anyway rather than reintroduce something the
+    // user already knows. Blocked and dismissed names are excluded permanently, but a liked
+    // name is only excluded while it stays in the liked list: this filter reads live state,
+    // so removing the artist from My Artists later makes it suggestable again.
     List<RecommendedArtist> filtered = suggested
       .stream()
       .filter(r -> !excludedLower.contains(r.name().toLowerCase(Locale.ROOT)))

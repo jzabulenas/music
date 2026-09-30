@@ -1,5 +1,6 @@
 package com.example.demo.saved;
 
+import com.example.demo.artist.LikedArtistService;
 import com.example.demo.dismissed.DismissedArtistService;
 import java.util.List;
 import java.util.Optional;
@@ -15,13 +16,16 @@ public class SavedArtistService {
 
   private final SavedArtistRepository repository;
   private final DismissedArtistService dismissedArtistService;
+  private final LikedArtistService likedArtistService;
 
   SavedArtistService(
     SavedArtistRepository repository,
-    DismissedArtistService dismissedArtistService
+    DismissedArtistService dismissedArtistService,
+    LikedArtistService likedArtistService
   ) {
     this.repository = repository;
     this.dismissedArtistService = dismissedArtistService;
+    this.likedArtistService = likedArtistService;
   }
 
   public List<SavedArtistResponse> findAll(Long userId) {
@@ -78,6 +82,27 @@ public class SavedArtistService {
     }
 
     this.dismissedArtistService.dismiss(userId, artist.get().getName());
+
+    this.repository.deleteByIdAndUserId(id, userId);
+  }
+
+  // `deleteByIdAndUserId` uses `em.remove()` internally, which requires an active transaction.
+  // Liking an artist promotes it to the liked list, so it seeds future generations,
+  // and removes it from the saved list. Unlike removal, it is not dismissed: removing it
+  // from the liked list later allows it to be suggested again, since it was never rejected.
+  @Transactional
+  public void like(Long id, Long userId) {
+    Optional<SavedArtist> artist = this.repository.findByIdAndUserId(
+      id,
+      userId
+    );
+
+    // Defensive: an unknown id, or one owned by another user, is a no-op rather than an error.
+    if (artist.isEmpty()) {
+      return;
+    }
+
+    this.likedArtistService.addIfAbsent(userId, artist.get().getName());
 
     this.repository.deleteByIdAndUserId(id, userId);
   }

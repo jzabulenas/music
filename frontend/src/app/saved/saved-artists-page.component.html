@@ -10,7 +10,11 @@
   <ul class="saved-list">
     @for (artist of savedArtists(); track artist.id) {
       <li>
-        <app-saved-artist-card [savedArtist]="artist" (removed)="onRemove($event)" />
+        <app-saved-artist-card
+          [savedArtist]="artist"
+          (liked)="onLike($event)"
+          (removed)="onRemove($event)"
+        />
       </li>
     }
   </ul>
