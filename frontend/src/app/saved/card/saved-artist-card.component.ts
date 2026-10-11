@@ -12,7 +12,12 @@ import { SavedArtist } from '../saved-artist.model';
 })
 export class SavedArtistCardComponent {
   savedArtist = input.required<SavedArtist>();
+  liked = output<number>();
   removed = output<number>();
+
+  protected onLike(): void {
+    this.liked.emit(this.savedArtist().id);
+  }
 
   protected onRemove(): void {
     this.removed.emit(this.savedArtist().id);

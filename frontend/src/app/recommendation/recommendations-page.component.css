@@ -17,6 +17,12 @@
   margin-bottom: 16px;
 }
 
+.quota-hint {
+  margin: -16px 0 24px;
+  font-size: 0.875rem;
+  color: var(--mat-sys-on-surface-variant);
+}
+
 .recommendation-list {
   list-style: none;
   margin: 0;

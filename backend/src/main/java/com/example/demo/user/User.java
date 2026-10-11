@@ -18,6 +18,10 @@ public class User {
   @Column(nullable = false, updatable = false)
   private Instant createdAt;
 
+  @Enumerated(EnumType.STRING)
+  @Column(nullable = false, length = 20)
+  private Role role = Role.USER;
+
   @SuppressWarnings("NullAway.Init")
   User() {}
 
@@ -32,5 +36,9 @@ public class User {
 
   public String getEmail() {
     return this.email;
+  }
+
+  Role getRole() {
+    return this.role;
   }
 }

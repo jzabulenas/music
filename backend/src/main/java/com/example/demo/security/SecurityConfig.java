@@ -1,5 +1,6 @@
 package com.example.demo.security;
 
+import java.time.Duration;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -11,6 +12,9 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationSuccessHandler;
 import org.springframework.security.web.authentication.logout.HttpStatusReturningLogoutSuccessHandler;
+import org.springframework.security.web.session.DisableEncodeUrlFilter;
+import org.springframework.session.web.http.CookieSerializer;
+import org.springframework.session.web.http.DefaultCookieSerializer;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
@@ -28,9 +32,11 @@ class SecurityConfig {
   @Bean
   SecurityFilterChain securityFilterChain(
     HttpSecurity http,
-    MagicLinkSuccessHandler magicLinkSuccessHandler
+    MagicLinkSuccessHandler magicLinkSuccessHandler,
+    SlidingSessionCookieFilter slidingSessionCookieFilter
   ) throws Exception {
     http
+      .addFilterBefore(slidingSessionCookieFilter, DisableEncodeUrlFilter.class)
       .authorizeHttpRequests(auth ->
         auth
           .requestMatchers("/ott/generate", "/login/ott", "/error")
@@ -67,6 +73,16 @@ class SecurityConfig {
   @Bean
   JdbcOneTimeTokenService oneTimeTokenService(JdbcTemplate jdbcTemplate) {
     return new JdbcOneTimeTokenService(jdbcTemplate);
+  }
+
+  @Bean
+  CookieSerializer cookieSerializer(
+    @Value("${spring.session.timeout}") Duration sessionTimeout
+  ) {
+    DefaultCookieSerializer serializer = new DefaultCookieSerializer();
+    serializer.setCookieMaxAge((int) sessionTimeout.toSeconds());
+
+    return serializer;
   }
 
   @Bean

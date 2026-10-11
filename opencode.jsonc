@@ -1,0 +1,49 @@
+{
+  "$schema": "https://opencode.ai/config.json",
+  "formatter": {
+    // Disable the built-in prettier formatter; we use one custom wrapper
+    // that runs the per-package Prettier install with its own working
+    // directory, so each package's .prettierrc and node_modules apply.
+    "prettier": {
+      "disabled": true,
+    },
+    "project-prettier": {
+      "command": [
+        "bash",
+        "-c",
+        "f=\"$1\"; case \"$f\" in */frontend/*) cd frontend && ./node_modules/.bin/prettier --write \"$f\";; */backend/*) cd backend && ./node_modules/.bin/prettier --plugin=prettier-plugin-java --write \"$f\";; esac",
+        "prettier",
+        "$FILE",
+      ],
+      "extensions": [
+        ".js",
+        ".jsx",
+        ".mjs",
+        ".cjs",
+        ".ts",
+        ".tsx",
+        ".mts",
+        ".cts",
+        ".html",
+        ".htm",
+        ".css",
+        ".scss",
+        ".sass",
+        ".less",
+        ".vue",
+        ".svelte",
+        ".json",
+        ".jsonc",
+        ".yaml",
+        ".yml",
+        ".toml",
+        ".xml",
+        ".md",
+        ".mdx",
+        ".graphql",
+        ".gql",
+        ".java",
+      ],
+    },
+  },
+}

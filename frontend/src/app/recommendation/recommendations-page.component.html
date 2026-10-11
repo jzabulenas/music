@@ -10,6 +10,13 @@
   (generate)="onGenerate()"
 />
 
+@if (remainingRequests() !== null) {
+  <p class="quota-hint">
+    {{ remainingRequests() }} generation
+    {{ remainingRequests() === 1 ? 'request' : 'requests' }} left today
+  </p>
+}
+
 @if (recommendations().length > 0) {
   <ul class="recommendation-list">
     @for (rec of recommendations(); track rec.id) {

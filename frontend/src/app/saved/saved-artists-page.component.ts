@@ -28,4 +28,11 @@ export class SavedArtistsPageComponent implements OnInit {
       error: () => this.error.set('Failed to remove artist.'),
     });
   }
+
+  protected onLike(id: number): void {
+    this.error.set(null);
+    this.savedArtistService.like(id).subscribe({
+      error: () => this.error.set('Failed to like artist.'),
+    });
+  }
 }

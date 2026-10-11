@@ -17,7 +17,8 @@ public class LikedArtistService {
   }
 
   public List<ArtistResponse> findAll(Long userId) {
-    return this.repository.findByUserId(userId)
+    return this.repository
+      .findByUserId(userId)
       .stream()
       .map(a -> new ArtistResponse(a.getId(), a.getName(), a.getAddedAt()))
       .toList();
@@ -43,6 +44,22 @@ public class LikedArtistService {
     }
   }
 
+  // Check first instead of relying on catching `DataIntegrityViolationException` alone:
+  // when called within an outer transaction (e.g. liking a saved artist), a constraint
+  // violation may only surface at commit time, past any catch block here.
+  // Liking an artist that is already liked is not an error, just a no-op.
+  public void addIfAbsent(Long userId, String name) {
+    if (this.repository.existsByUserIdAndName(userId, name)) {
+      return;
+    }
+
+    try {
+      this.repository.save(new LikedArtist(userId, name));
+    } catch (DataIntegrityViolationException e) {
+      // Already liked for this user - liking again is not an error, just a no-op.
+    }
+  }
+
   // `deleteByIdAndUserId` uses `em.remove()` internally, which requires an active transaction.
   @Transactional
   public void delete(Long id, Long userId) {
@@ -50,7 +67,8 @@ public class LikedArtistService {
   }
 
   public List<String> getNames(Long userId) {
-    return this.repository.findByUserId(userId)
+    return this.repository
+      .findByUserId(userId)
       .stream()
       .map(LikedArtist::getName)
       .toList();

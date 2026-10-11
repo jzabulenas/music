@@ -1,6 +1,9 @@
 package com.example.demo.saved;
 
+import com.example.demo.artist.LikedArtistService;
+import com.example.demo.dismissed.DismissedArtistService;
 import java.util.List;
+import java.util.Optional;
 import org.jspecify.annotations.Nullable;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatusCode;
@@ -12,13 +15,22 @@ import org.springframework.web.server.ResponseStatusException;
 public class SavedArtistService {
 
   private final SavedArtistRepository repository;
+  private final DismissedArtistService dismissedArtistService;
+  private final LikedArtistService likedArtistService;
 
-  SavedArtistService(SavedArtistRepository repository) {
+  SavedArtistService(
+    SavedArtistRepository repository,
+    DismissedArtistService dismissedArtistService,
+    LikedArtistService likedArtistService
+  ) {
     this.repository = repository;
+    this.dismissedArtistService = dismissedArtistService;
+    this.likedArtistService = likedArtistService;
   }
 
   public List<SavedArtistResponse> findAll(Long userId) {
-    return this.repository.findByUserId(userId)
+    return this.repository
+      .findByUserId(userId)
       .stream()
       .map(a ->
         new SavedArtistResponse(
@@ -56,13 +68,48 @@ public class SavedArtistService {
   }
 
   // `deleteByIdAndUserId` uses `em.remove()` internally, which requires an active transaction.
+  // Removing an artist also dismisses it, so it is never suggested in future generations.
   @Transactional
   public void delete(Long id, Long userId) {
+    Optional<SavedArtist> artist = this.repository.findByIdAndUserId(
+      id,
+      userId
+    );
+
+    // Defensive: an unknown id, or one owned by another user, is a no-op rather than an error.
+    if (artist.isEmpty()) {
+      return;
+    }
+
+    this.dismissedArtistService.dismiss(userId, artist.get().getName());
+
+    this.repository.deleteByIdAndUserId(id, userId);
+  }
+
+  // `deleteByIdAndUserId` uses `em.remove()` internally, which requires an active transaction.
+  // Liking an artist promotes it to the liked list, so it seeds future generations,
+  // and removes it from the saved list. Unlike removal, it is not dismissed: removing it
+  // from the liked list later allows it to be suggested again, since it was never rejected.
+  @Transactional
+  public void like(Long id, Long userId) {
+    Optional<SavedArtist> artist = this.repository.findByIdAndUserId(
+      id,
+      userId
+    );
+
+    // Defensive: an unknown id, or one owned by another user, is a no-op rather than an error.
+    if (artist.isEmpty()) {
+      return;
+    }
+
+    this.likedArtistService.addIfAbsent(userId, artist.get().getName());
+
     this.repository.deleteByIdAndUserId(id, userId);
   }
 
   public List<String> getNames(Long userId) {
-    return this.repository.findByUserId(userId)
+    return this.repository
+      .findByUserId(userId)
       .stream()
       .map(SavedArtist::getName)
       .toList();

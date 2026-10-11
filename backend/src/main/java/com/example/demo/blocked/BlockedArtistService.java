@@ -22,7 +22,8 @@ public class BlockedArtistService {
   }
 
   public List<String> getNames(Long userId) {
-    return this.repository.findByUserId(userId)
+    return this.repository
+      .findByUserId(userId)
       .stream()
       .map(BlockedArtist::getName)
       .toList();

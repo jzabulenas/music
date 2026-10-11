@@ -25,9 +25,9 @@ class BlockedArtistController {
 
   @GetMapping
   List<String> list(@AuthenticationPrincipal UserDetails userDetails) {
-    Long userId = this.userService.findByEmail(
-      userDetails.getUsername()
-    ).getId();
+    Long userId = this.userService
+      .findByEmail(userDetails.getUsername())
+      .getId();
 
     return this.blockedArtistService.getNames(userId);
   }
@@ -38,9 +38,9 @@ class BlockedArtistController {
     @AuthenticationPrincipal UserDetails userDetails,
     @Valid @RequestBody BlockArtistRequest request
   ) {
-    Long userId = this.userService.findByEmail(
-      userDetails.getUsername()
-    ).getId();
+    Long userId = this.userService
+      .findByEmail(userDetails.getUsername())
+      .getId();
 
     this.blockedArtistService.block(userId, request.name());
   }

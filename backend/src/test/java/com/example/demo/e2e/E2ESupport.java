@@ -4,6 +4,10 @@ import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
 import io.restassured.response.Response;
 import io.restassured.specification.RequestSpecification;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
 import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -18,6 +22,21 @@ class E2ESupport {
   static final String MAILPIT_URL = System.getenv().getOrDefault(
     "MAILPIT_URL",
     "http://localhost:8026"
+  );
+
+  static final String DB_URL = System.getenv().getOrDefault(
+    "DB_URL",
+    "jdbc:mariadb://localhost:3307/music"
+  );
+
+  static final String DB_USERNAME = System.getenv().getOrDefault(
+    "DB_USERNAME",
+    "music"
+  );
+
+  static final String DB_PASSWORD = System.getenv().getOrDefault(
+    "DB_PASSWORD",
+    "music"
   );
 
   static String uniqueEmail() {
@@ -94,5 +113,41 @@ class E2ESupport {
       .contentType(ContentType.JSON)
       .redirects()
       .follow(false);
+  }
+
+  // Promotes a user to admin the same way production would: a manual SQL update.
+  static void promoteToAdmin(String email) {
+    try (
+      Connection connection = DriverManager.getConnection(
+        DB_URL,
+        DB_USERNAME,
+        DB_PASSWORD
+      );
+      PreparedStatement statement = connection.prepareStatement(
+        "UPDATE users SET role = 'ADMIN' WHERE email = ?"
+      )
+    ) {
+      statement.setString(1, email);
+
+      if (statement.executeUpdate() != 1) {
+        throw new AssertionError("No user found to promote: " + email);
+      }
+    } catch (SQLException e) {
+      throw new IllegalStateException("Failed to promote user: " + email, e);
+    }
+  }
+
+  static void addLikedArtists(RequestSpecification spec, String... names) {
+    for (String name : names) {
+      spec
+        .body(
+          """
+          {"name": "%s"}
+          """.formatted(name)
+        )
+        .post("/api/v1/liked-artists")
+        .then()
+        .statusCode(201);
+    }
   }
 }
