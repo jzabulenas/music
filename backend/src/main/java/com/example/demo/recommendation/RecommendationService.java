@@ -48,9 +48,14 @@ class RecommendationService {
   }
 
   List<RecommendationResponse> getAll(Long userId) {
+    Set<String> excludedLower = this.excludedNamesLower(userId);
+
     return this.repository
       .findByUserId(userId)
       .stream()
+      .filter(
+        r -> !excludedLower.contains(r.getName().toLowerCase(Locale.ROOT))
+      )
       .map(r ->
         new RecommendationResponse(
           r.getId(),
@@ -93,15 +98,7 @@ class RecommendationService {
       savedNames
     );
 
-    Set<String> excludedLower = Stream.of(
-      names,
-      blockedNames,
-      dismissedNames,
-      savedNames
-    )
-      .flatMap(List::stream)
-      .map(n -> n.toLowerCase(Locale.ROOT))
-      .collect(Collectors.toSet());
+    Set<String> excludedLower = this.excludedNamesLower(userId);
 
     // Defensive safety net: the prompt already asks the model to avoid liked, rejected or
     // saved artists, but drop any it suggests anyway rather than reintroduce something the
@@ -136,5 +133,20 @@ class RecommendationService {
         )
       )
       .toList();
+  }
+
+  // Liked, blocked, dismissed and saved names all mean the user has already acted on the
+  // artist: `getAll` drops such rows so a reviewed recommendation never shows up again,
+  // and `generate` never re-suggests them.
+  private Set<String> excludedNamesLower(Long userId) {
+    return Stream.of(
+      this.likedArtistService.getNames(userId),
+      this.blockedArtistService.getNames(userId),
+      this.dismissedArtistService.getNames(userId),
+      this.savedArtistService.getNames(userId)
+    )
+      .flatMap(List::stream)
+      .map(n -> n.toLowerCase(Locale.ROOT))
+      .collect(Collectors.toSet());
   }
 }
