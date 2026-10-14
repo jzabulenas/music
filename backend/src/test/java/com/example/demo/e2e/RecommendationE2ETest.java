@@ -55,6 +55,164 @@ class RecommendationE2ETest extends E2ESupport {
   }
 
   @Test
+  void getRecommendations_afterSavingArtist_excludesItFromTheList() {
+    RequestSpecification spec = login(uniqueEmail());
+    addLikedArtists(spec, "Radiohead", "Portishead", "Massive Attack");
+
+    List<String> generatedNames = spec
+      .post("/api/v1/recommendations/generate")
+      .then()
+      .statusCode(200)
+      .extract()
+      .jsonPath()
+      .getList("name", String.class);
+    String saved = generatedNames.get(0);
+
+    spec
+      .body(
+        """
+        {"name": "%s"}
+        """.formatted(saved)
+      )
+      .post("/api/v1/saved-artists")
+      .then()
+      .statusCode(201);
+
+    List<String> remainingNames = spec
+      .get("/api/v1/recommendations")
+      .then()
+      .statusCode(200)
+      .extract()
+      .jsonPath()
+      .getList("name", String.class);
+
+    assertThat(remainingNames, not(hasItem(saved)));
+    assertThat(remainingNames, hasSize(generatedNames.size() - 1));
+  }
+
+  @Test
+  void getRecommendations_afterBlockingArtist_excludesItFromTheList() {
+    RequestSpecification spec = login(uniqueEmail());
+    addLikedArtists(spec, "Radiohead", "Portishead", "Massive Attack");
+
+    List<String> generatedNames = spec
+      .post("/api/v1/recommendations/generate")
+      .then()
+      .statusCode(200)
+      .extract()
+      .jsonPath()
+      .getList("name", String.class);
+    String blocked = generatedNames.get(0);
+
+    spec
+      .body(
+        """
+        {"name": "%s"}
+        """.formatted(blocked)
+      )
+      .post("/api/v1/blocked-artists")
+      .then()
+      .statusCode(204);
+
+    List<String> remainingNames = spec
+      .get("/api/v1/recommendations")
+      .then()
+      .statusCode(200)
+      .extract()
+      .jsonPath()
+      .getList("name", String.class);
+
+    assertThat(remainingNames, not(hasItem(blocked)));
+    assertThat(remainingNames, hasSize(generatedNames.size() - 1));
+  }
+
+  @Test
+  void getRecommendations_afterRemovingSavedArtist_excludesItFromTheList() {
+    RequestSpecification spec = login(uniqueEmail());
+    addLikedArtists(spec, "Radiohead", "Portishead", "Massive Attack");
+
+    List<String> generatedNames = spec
+      .post("/api/v1/recommendations/generate")
+      .then()
+      .statusCode(200)
+      .extract()
+      .jsonPath()
+      .getList("name", String.class);
+    String removed = generatedNames.get(0);
+
+    int savedId = spec
+      .body(
+        """
+        {"name": "%s"}
+        """.formatted(removed)
+      )
+      .post("/api/v1/saved-artists")
+      .then()
+      .statusCode(201)
+      .extract()
+      .path("id");
+
+    spec
+      .delete("/api/v1/saved-artists/" + savedId)
+      .then()
+      .statusCode(204);
+
+    List<String> remainingNames = spec
+      .get("/api/v1/recommendations")
+      .then()
+      .statusCode(200)
+      .extract()
+      .jsonPath()
+      .getList("name", String.class);
+
+    assertThat(remainingNames, not(hasItem(removed)));
+    assertThat(remainingNames, hasSize(generatedNames.size() - 1));
+  }
+
+  @Test
+  void getRecommendations_afterLikingSavedArtist_excludesItFromTheList() {
+    RequestSpecification spec = login(uniqueEmail());
+    addLikedArtists(spec, "Radiohead", "Portishead", "Massive Attack");
+
+    List<String> generatedNames = spec
+      .post("/api/v1/recommendations/generate")
+      .then()
+      .statusCode(200)
+      .extract()
+      .jsonPath()
+      .getList("name", String.class);
+    String liked = generatedNames.get(0);
+
+    int savedId = spec
+      .body(
+        """
+        {"name": "%s"}
+        """.formatted(liked)
+      )
+      .post("/api/v1/saved-artists")
+      .then()
+      .statusCode(201)
+      .extract()
+      .path("id");
+
+    spec
+      .post("/api/v1/saved-artists/" + savedId + "/like")
+      .then()
+      .statusCode(204);
+
+    List<String> remainingNames = spec
+      .get("/api/v1/recommendations")
+      .then()
+      .statusCode(200)
+      .extract()
+      .jsonPath()
+      .getList("name", String.class);
+
+    assertThat(remainingNames, not(hasItem(liked)));
+    assertThat(remainingNames, hasSize(generatedNames.size() - 1));
+  }
+
+  @Test
   void generateTwice_replacesOldRecommendations() {
     RequestSpecification spec = login(uniqueEmail());
     addLikedArtists(spec, "Radiohead", "Portishead", "Massive Attack");

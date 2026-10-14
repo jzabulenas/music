@@ -7,6 +7,7 @@ import {
   signal,
 } from '@angular/core';
 import { HttpErrorResponse } from '@angular/common/http';
+import { Observable } from 'rxjs';
 import { ArtistService } from '../artist/artist.service';
 import { AuthService } from '../core/auth.service';
 import { RecommendationService } from './recommendation.service';
@@ -14,11 +15,16 @@ import { SavedArtistService } from '../saved/saved-artist.service';
 import { BlockedArtistService } from '../blocked/blocked-artist.service';
 import { GenerateButtonComponent } from './generate/generate-button.component';
 import { RecommendationCardComponent } from './card/recommendation-card.component';
+import { RecommendationsEmptyStateComponent } from './empty/recommendations-empty-state.component';
 import { Recommendation } from './recommendation.model';
 
 @Component({
   selector: 'app-recommendations-page',
-  imports: [GenerateButtonComponent, RecommendationCardComponent],
+  imports: [
+    GenerateButtonComponent,
+    RecommendationCardComponent,
+    RecommendationsEmptyStateComponent,
+  ],
   templateUrl: './recommendations-page.component.html',
   styleUrl: './recommendations-page.component.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -34,10 +40,6 @@ export class RecommendationsPageComponent implements OnInit {
   protected readonly recommendations = this.recommendationService.recommendations;
   protected readonly loading = signal(false);
   protected readonly error = signal<string | null>(null);
-  protected readonly blockedArtistNames = signal<ReadonlySet<string>>(new Set());
-  protected readonly savedArtistNames = computed(
-    () => new Set(this.savedArtistService.savedArtists().map((artist) => artist.name)),
-  );
   protected readonly remainingRequests = computed(
     () => this.authService.currentUser()?.remainingRequests ?? null,
   );
@@ -49,15 +51,6 @@ export class RecommendationsPageComponent implements OnInit {
 
     this.recommendationService.load().subscribe({
       error: () => this.error.set('Failed to load recommendations.'),
-    });
-
-    this.savedArtistService.load().subscribe({
-      error: () => this.error.set('Failed to load saved artists.'),
-    });
-
-    this.blockedArtistService.list().subscribe({
-      next: (names) => this.blockedArtistNames.set(new Set(names)),
-      error: () => this.error.set('Failed to load blocked artists.'),
     });
   }
 
@@ -80,16 +73,39 @@ export class RecommendationsPageComponent implements OnInit {
   }
 
   protected onSave(recommendation: Recommendation): void {
-    this.savedArtistService.save(recommendation.name, recommendation.genre).subscribe({
-      error: () => this.error.set('Failed to save artist.'),
-    });
+    this.reviewRecommendation(
+      recommendation,
+      this.savedArtistService.save(recommendation.name, recommendation.genre),
+      'Failed to save artist.',
+    );
   }
 
   protected onBlock(recommendation: Recommendation): void {
-    this.blockedArtistService.block(recommendation.name).subscribe({
-      next: () =>
-        this.blockedArtistNames.update((names) => new Set([...names, recommendation.name])),
-      error: () => this.error.set('Failed to block artist.'),
+    this.reviewRecommendation(
+      recommendation,
+      this.blockedArtistService.block(recommendation.name),
+      'Failed to block artist.',
+    );
+  }
+
+  // Removing the card right away makes reviewing the queue feel instant. If persisting the
+  // decision fails, put the card back at its original position so nothing is lost.
+  private reviewRecommendation(
+    recommendation: Recommendation,
+    action: Observable<unknown>,
+    failureMessage: string,
+  ): void {
+    this.error.set(null);
+
+    const index = this.recommendations().indexOf(recommendation);
+
+    this.recommendationService.remove(recommendation);
+
+    action.subscribe({
+      error: () => {
+        this.recommendationService.restore(recommendation, index);
+        this.error.set(failureMessage);
+      },
     });
   }
 }

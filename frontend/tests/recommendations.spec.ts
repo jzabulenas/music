@@ -8,6 +8,9 @@ function uniqueEmail(): string {
   return `recs-${crypto.randomUUID().slice(0, 8)}@e2e.test`;
 }
 
+const EMPTY_STATE_MESSAGE =
+  'No recommendations to review yet. Use the generate button above to discover new artists!';
+
 test.beforeEach(async ({ page }) => {
   await loginAs(page, uniqueEmail());
   await page.goto('/app/recommendations');
@@ -76,53 +79,102 @@ test('each card shows artist name, genre text, and reason text', async ({ page }
   }
 });
 
-test('clicking Save on a recommendation card triggers a success indication', async ({ page }) => {
+test('clicking Save on a recommendation card removes it from the list', async ({ page }) => {
   await generateRecommendations(page);
 
   const card = recommendationCards(page).first();
+  const artistName = await card.getByTestId('artist-name').innerText();
   await card.getByRole('button', { name: 'Save for later' }).click();
 
-  await expect(card.getByRole('button', { name: 'Saved' })).toBeDisabled();
+  await expect(recommendationCards(page)).toHaveCount(4);
+  await expect(recommendationCards(page).filter({ hasText: artistName })).toHaveCount(0);
 });
 
-test('clicking "Don\'t suggest again" blocks the artist without removing the card', async ({
+test('clicking "Don\'t suggest again" removes the card from the list', async ({ page }) => {
+  await generateRecommendations(page);
+
+  const card = recommendationCards(page).first();
+  const artistName = await card.getByTestId('artist-name').innerText();
+  await card.getByRole('button', { name: "Don't suggest again" }).click();
+
+  await expect(recommendationCards(page)).toHaveCount(4);
+  await expect(recommendationCards(page).filter({ hasText: artistName })).toHaveCount(0);
+});
+
+test('a blocked artist does not reappear in recommendations after reloading the page', async ({
   page,
 }) => {
   await generateRecommendations(page);
 
   const card = recommendationCards(page).first();
+  const artistName = await card.getByTestId('artist-name').innerText();
   await card.getByRole('button', { name: "Don't suggest again" }).click();
+  await expect(recommendationCards(page)).toHaveCount(4);
 
-  await expect(card.getByRole('button', { name: "Won't suggest again" })).toBeDisabled();
+  await page.reload();
+
+  await expect(recommendationCards(page)).toHaveCount(4);
+  await expect(recommendationCards(page).filter({ hasText: artistName })).toHaveCount(0);
+});
+
+test('a saved artist does not reappear in recommendations after reloading the page', async ({
+  page,
+}) => {
+  await generateRecommendations(page);
+
+  const card = recommendationCards(page).first();
+  const artistName = await card.getByTestId('artist-name').innerText();
+  await card.getByRole('button', { name: 'Save for later' }).click();
+  await expect(recommendationCards(page)).toHaveCount(4);
+
+  await page.reload();
+
+  await expect(recommendationCards(page)).toHaveCount(4);
+  await expect(recommendationCards(page).filter({ hasText: artistName })).toHaveCount(0);
+});
+
+test('reviewing all recommendations shows the empty state', async ({ page }) => {
+  await generateRecommendations(page);
+
+  for (let i = 0; i < 2; i++) {
+    await recommendationCards(page).first().getByRole('button', { name: 'Save for later' }).click();
+  }
+
+  for (let i = 0; i < 3; i++) {
+    await recommendationCards(page)
+      .first()
+      .getByRole('button', { name: "Don't suggest again" })
+      .click();
+  }
+
+  await expect(recommendationCards(page)).toHaveCount(0);
+  await expect(page.getByText(EMPTY_STATE_MESSAGE)).toBeVisible();
+});
+
+test('a failed save restores the card and shows an error message', async ({ page }) => {
+  await generateRecommendations(page);
+
+  const card = recommendationCards(page).first();
+  const artistName = await card.getByTestId('artist-name').innerText();
+
+  await page.route('**/api/v1/saved-artists', (route) => route.abort());
+  await card.getByRole('button', { name: 'Save for later' }).click();
+
+  await expect(page.getByText('Failed to save artist.')).toBeVisible();
   await expect(recommendationCards(page)).toHaveCount(5);
+  await expect(recommendationCards(page).filter({ hasText: artistName })).toHaveCount(1);
 });
 
-test('a blocked artist still shows "Won\'t suggest again" after reloading the page', async ({
-  page,
-}) => {
+test('a failed block restores the card and shows an error message', async ({ page }) => {
   await generateRecommendations(page);
 
   const card = recommendationCards(page).first();
-  const artistName = await card.getByTestId('artist-name').textContent();
+  const artistName = await card.getByTestId('artist-name').innerText();
+
+  await page.route('**/api/v1/blocked-artists', (route) => route.abort());
   await card.getByRole('button', { name: "Don't suggest again" }).click();
-  await expect(card.getByRole('button', { name: "Won't suggest again" })).toBeDisabled();
 
-  await page.reload();
-
-  const cardAfterReload = recommendationCards(page).filter({ hasText: artistName ?? '' });
-  await expect(cardAfterReload.getByRole('button', { name: "Won't suggest again" })).toBeDisabled();
-});
-
-test('a saved artist still shows "Saved" after reloading the page', async ({ page }) => {
-  await generateRecommendations(page);
-
-  const card = recommendationCards(page).first();
-  const artistName = await card.getByTestId('artist-name').textContent();
-  await card.getByRole('button', { name: 'Save for later' }).click();
-  await expect(card.getByRole('button', { name: 'Saved' })).toBeDisabled();
-
-  await page.reload();
-
-  const cardAfterReload = recommendationCards(page).filter({ hasText: artistName ?? '' });
-  await expect(cardAfterReload.getByRole('button', { name: 'Saved' })).toBeDisabled();
+  await expect(page.getByText('Failed to block artist.')).toBeVisible();
+  await expect(recommendationCards(page)).toHaveCount(5);
+  await expect(recommendationCards(page).filter({ hasText: artistName })).toHaveCount(1);
 });

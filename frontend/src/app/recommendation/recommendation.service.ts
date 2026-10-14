@@ -21,4 +21,24 @@ export class RecommendationService {
       .post<Recommendation[]>('/api/v1/recommendations/generate', null)
       .pipe(tap((recs) => this.recommendations.set(recs)));
   }
+
+  remove(recommendation: Recommendation): void {
+    this.recommendations.update((recs) => recs.filter((r) => r.id !== recommendation.id));
+  }
+
+  // Puts a previously removed recommendation back at its original position. Defensive: a
+  // no-op if the recommendation is somehow already back in the list.
+  restore(recommendation: Recommendation, index: number): void {
+    this.recommendations.update((recs) => {
+      if (recs.some((r) => r.id === recommendation.id)) {
+        return recs;
+      }
+
+      const restored = [...recs];
+
+      restored.splice(Math.min(index, restored.length), 0, recommendation);
+
+      return restored;
+    });
+  }
 }
