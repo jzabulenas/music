@@ -1,0 +1,9 @@
+<mat-form-field>
+  <mat-label>Genre</mat-label>
+
+  <mat-select data-testid="genre-select" [value]="genre()" (valueChange)="onGenreChange($event)">
+    @for (option of genres; track option) {
+      <mat-option [value]="option">{{ option }}</mat-option>
+    }
+  </mat-select>
+</mat-form-field>

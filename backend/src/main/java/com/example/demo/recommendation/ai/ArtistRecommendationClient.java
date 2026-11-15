@@ -1,6 +1,8 @@
 package com.example.demo.recommendation.ai;
 
+import com.example.demo.recommendation.RecommendationGenre;
 import java.util.List;
+import org.jspecify.annotations.Nullable;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.stereotype.Component;
 
@@ -16,7 +18,8 @@ public class ArtistRecommendationClient {
   public List<RecommendedArtist> recommend(
     List<String> likedArtists,
     List<String> rejectedArtists,
-    List<String> savedArtists
+    List<String> savedArtists,
+    @Nullable RecommendationGenre genre
   ) {
     String artistList = String.join(", ", likedArtists);
     String rejectedList = rejectedArtists.isEmpty()
@@ -26,6 +29,16 @@ public class ArtistRecommendationClient {
       ? "none"
       : String.join(", ", savedArtists);
 
+    // An empty instruction leaves the prompt unchanged: `Default` means any genre.
+    String genreInstruction =
+      genre == null
+        ? ""
+        : "Every suggested artist must be a " +
+          genre.displayName() +
+          " artist: report " +
+          genre.displayName() +
+          " as the primary genre of each one.";
+
     RecommendedArtistResponse response = this.chatClient
       .prompt()
       .user(u ->
@@ -33,14 +46,16 @@ public class ArtistRecommendationClient {
           .text(
             """
             I love these artists: {artists}.
-            Suggest exactly 5 music artists I haven't listed that I'd likely enjoy.
+            Suggest exactly 8 music artists I haven't listed that I'd likely enjoy.
             For each provide: name, primary genre, one-sentence reason why I'd like them.
+            {genre}
             Don't repeat any artist from my list.
             Never suggest any of these artists, as I've already rejected them: {rejected}.
             Never suggest any of these artists either, as I've already saved them for later: {saved}.
             """
           )
           .param("artists", artistList)
+          .param("genre", genreInstruction)
           .param("rejected", rejectedList)
           .param("saved", savedList)
       )

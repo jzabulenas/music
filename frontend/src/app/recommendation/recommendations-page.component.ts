@@ -14,14 +14,16 @@ import { RecommendationService } from './recommendation.service';
 import { SavedArtistService } from '../saved/saved-artist.service';
 import { BlockedArtistService } from '../blocked/blocked-artist.service';
 import { GenerateButtonComponent } from './generate/generate-button.component';
+import { GenreSelectComponent } from './generate/genre-select/genre-select.component';
 import { RecommendationCardComponent } from './card/recommendation-card.component';
 import { RecommendationsEmptyStateComponent } from './empty/recommendations-empty-state.component';
-import { Recommendation } from './recommendation.model';
+import { Recommendation, RecommendationGenre } from './recommendation.model';
 
 @Component({
   selector: 'app-recommendations-page',
   imports: [
     GenerateButtonComponent,
+    GenreSelectComponent,
     RecommendationCardComponent,
     RecommendationsEmptyStateComponent,
   ],
@@ -40,6 +42,7 @@ export class RecommendationsPageComponent implements OnInit {
   protected readonly recommendations = this.recommendationService.recommendations;
   protected readonly loading = signal(false);
   protected readonly error = signal<string | null>(null);
+  protected readonly selectedGenre = signal<RecommendationGenre>('Default');
   protected readonly remainingRequests = computed(
     () => this.authService.currentUser()?.remainingRequests ?? null,
   );
@@ -54,11 +57,18 @@ export class RecommendationsPageComponent implements OnInit {
     });
   }
 
+  protected onGenreChange(genre: RecommendationGenre): void {
+    this.selectedGenre.set(genre);
+  }
+
   protected onGenerate(): void {
     this.loading.set(true);
     this.error.set(null);
 
-    this.recommendationService.generate().subscribe({
+    // `Default` means no genre constraint, which the backend expects as null.
+    const genre = this.selectedGenre() === 'Default' ? null : this.selectedGenre();
+
+    this.recommendationService.generate(genre).subscribe({
       next: () => this.authService.fetchCurrentUser().subscribe(),
       error: (httpError: HttpErrorResponse) => {
         this.error.set(

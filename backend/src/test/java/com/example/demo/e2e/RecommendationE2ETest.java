@@ -5,6 +5,7 @@ import static org.hamcrest.Matchers.anyOf;
 import static org.hamcrest.Matchers.emptyOrNullString;
 import static org.hamcrest.Matchers.emptyString;
 import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.equalToIgnoringCase;
 import static org.hamcrest.Matchers.everyItem;
 import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.hasSize;
@@ -351,6 +352,75 @@ class RecommendationE2ETest extends E2ESupport {
       .getList("name", String.class);
 
     assertThat(secondNames, not(hasItem(removed)));
+  }
+
+  @Test
+  void generateRecommendations_withRapGenre_returnsOnlyRapArtists() {
+    RequestSpecification spec = login(uniqueEmail());
+    addLikedArtists(spec, "Radiohead", "Portishead", "Massive Attack");
+
+    spec
+      .body(
+        """
+        {"genre": "Rap"}
+        """
+      )
+      .post("/api/v1/recommendations/generate")
+      .then()
+      .statusCode(200)
+      .body("$", hasSize(5))
+      .body("genre", everyItem(equalToIgnoringCase("Rap")));
+  }
+
+  @Test
+  void generateRecommendations_withRockGenre_returnsOnlyRockArtists() {
+    RequestSpecification spec = login(uniqueEmail());
+    addLikedArtists(spec, "Radiohead", "Portishead", "Massive Attack");
+
+    spec
+      .body(
+        """
+        {"genre": "Rock"}
+        """
+      )
+      .post("/api/v1/recommendations/generate")
+      .then()
+      .statusCode(200)
+      .body("$", hasSize(5))
+      .body("genre", everyItem(equalToIgnoringCase("Rock")));
+  }
+
+  @Test
+  void generateRecommendations_withNullGenre_returnsExactlyFiveArtists() {
+    RequestSpecification spec = login(uniqueEmail());
+    addLikedArtists(spec, "Radiohead", "Portishead", "Massive Attack");
+
+    spec
+      .body(
+        """
+        {"genre": null}
+        """
+      )
+      .post("/api/v1/recommendations/generate")
+      .then()
+      .statusCode(200)
+      .body("$", hasSize(5));
+  }
+
+  @Test
+  void generateRecommendations_withUnknownGenre_returns400() {
+    RequestSpecification spec = login(uniqueEmail());
+    addLikedArtists(spec, "Radiohead", "Portishead", "Massive Attack");
+
+    spec
+      .body(
+        """
+        {"genre": "Polka"}
+        """
+      )
+      .post("/api/v1/recommendations/generate")
+      .then()
+      .statusCode(400);
   }
 
   @Test
