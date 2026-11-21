@@ -4,11 +4,15 @@
   <p class="error-msg" role="alert">{{ error() }}</p>
 }
 
-<app-generate-button
-  [artistCount]="artistCount()"
-  [loading]="loading()"
-  (generate)="onGenerate()"
-/>
+<div class="generate-row">
+  <app-genre-select [genre]="selectedGenre()" (genreChange)="onGenreChange($event)" />
+
+  <app-generate-button
+    [artistCount]="artistCount()"
+    [loading]="loading()"
+    (generate)="onGenerate()"
+  />
+</div>
 
 @if (remainingRequests() !== null) {
   <p class="quota-hint">

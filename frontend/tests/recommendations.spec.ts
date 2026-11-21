@@ -1,8 +1,13 @@
 import { expect, test } from '@playwright/test';
 
+import { RECOMMENDATION_GENRES } from '../src/app/recommendation/recommendation.model';
 import { addArtist } from './helpers/artists';
 import { loginAs } from './helpers/auth';
-import { generateRecommendations, recommendationCards } from './helpers/recommendations';
+import {
+  generateRecommendations,
+  generateRecommendationsWithGenre,
+  recommendationCards,
+} from './helpers/recommendations';
 
 function uniqueEmail(): string {
   return `recs-${crypto.randomUUID().slice(0, 8)}@e2e.test`;
@@ -18,6 +23,32 @@ test.beforeEach(async ({ page }) => {
 
 test('generate button is present on the recommendations page', async ({ page }) => {
   await expect(page.getByRole('button', { name: 'Generate recommendations' })).toBeVisible();
+});
+
+test('genre select defaults to Default', async ({ page }) => {
+  await expect(page.getByRole('combobox')).toContainText('Default');
+});
+
+test('genre select offers every available genre', async ({ page }) => {
+  await page.getByRole('combobox').click();
+
+  for (const genre of RECOMMENDATION_GENRES) {
+    await expect(page.getByRole('option', { name: genre, exact: true })).toBeVisible();
+  }
+
+  await page.keyboard.press('Escape');
+});
+
+test('generating with Rap selected only suggests rap artists', async ({ page }) => {
+  await generateRecommendationsWithGenre(page, 'Rap');
+
+  const genres = await recommendationCards(page).getByTestId('artist-genre').allInnerTexts();
+
+  expect(genres).toHaveLength(5);
+
+  for (const genre of genres) {
+    expect(genre.trim().toLowerCase()).toBe('rap');
+  }
 });
 
 test('with 0 liked artists, generate button is disabled and shows a warning', async ({ page }) => {

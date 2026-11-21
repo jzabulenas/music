@@ -16,9 +16,9 @@ export class RecommendationService {
       .pipe(tap((recs) => this.recommendations.set(recs)));
   }
 
-  generate(): Observable<Recommendation[]> {
+  generate(genre: string | null): Observable<Recommendation[]> {
     return this.http
-      .post<Recommendation[]>('/api/v1/recommendations/generate', null)
+      .post<Recommendation[]>('/api/v1/recommendations/generate', { genre })
       .pipe(tap((recs) => this.recommendations.set(recs)));
   }
 

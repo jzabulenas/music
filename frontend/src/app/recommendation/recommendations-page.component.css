@@ -17,6 +17,13 @@
   margin-bottom: 16px;
 }
 
+.generate-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
 .quota-hint {
   margin: -16px 0 24px;
   font-size: 0.875rem;

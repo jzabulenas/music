@@ -13,6 +13,7 @@ import java.util.Locale;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import org.jspecify.annotations.Nullable;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -20,6 +21,10 @@ import org.springframework.web.server.ResponseStatusException;
 
 @Service
 class RecommendationService {
+
+  // How many suggestions a generation shows. The AI client asks the model for more
+  // candidates than this so the excluded-name filter below cannot shrink the batch.
+  private static final int SUGGESTION_COUNT = 5;
 
   private final RecommendationRepository repository;
   private final LikedArtistService likedArtistService;
@@ -68,7 +73,10 @@ class RecommendationService {
   }
 
   @Transactional
-  public List<RecommendationResponse> generate(User user) {
+  public List<RecommendationResponse> generate(
+    User user,
+    @Nullable RecommendationGenre genre
+  ) {
     Long userId = user.getId();
     List<String> names = this.likedArtistService.getNames(userId);
 
@@ -95,7 +103,8 @@ class RecommendationService {
     List<RecommendedArtist> suggested = this.aiClient.recommend(
       names,
       rejectedNames,
-      savedNames
+      savedNames,
+      genre
     );
 
     Set<String> excludedLower = this.excludedNamesLower(userId);
@@ -105,9 +114,13 @@ class RecommendationService {
     // user already knows. Blocked and dismissed names are excluded permanently, but a liked
     // name is only excluded while it stays in the liked list: this filter reads live state,
     // so removing the artist from My Artists later makes it suggestable again.
+    //
+    // The model is asked for more candidates than this so that dropping an echo of an
+    // already-known artist still leaves a full batch of suggestions.
     List<RecommendedArtist> filtered = suggested
       .stream()
       .filter(r -> !excludedLower.contains(r.name().toLowerCase(Locale.ROOT)))
+      .limit(SUGGESTION_COUNT)
       .toList();
 
     // Replace previous recommendations so repeated generation does not accumulate rows.
