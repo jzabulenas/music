@@ -33,6 +33,14 @@ test('adding a second artist appends to the list', async ({ page }) => {
   await expect(page.getByText('2 artists added')).toBeVisible();
 });
 
+test('liked artists are listed in alphabetical order', async ({ page }) => {
+  await addArtist(page, 'Radiohead');
+  await addArtist(page, 'Portishead');
+  await addArtist(page, 'Autechre');
+
+  await expect(page.getByRole('listitem')).toHaveText([/Autechre/, /Portishead/, /Radiohead/]);
+});
+
 test('submitting a blank name shows a validation error', async ({ page }) => {
   await page.getByRole('button', { name: 'Add' }).click();
 

@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, input, output } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, input, output } from '@angular/core';
 import { ArtistChipComponent } from './item/artist-chip.component';
 import { LikedArtist } from '../../liked-artist.model';
 
@@ -12,4 +12,8 @@ import { LikedArtist } from '../../liked-artist.model';
 export class ArtistListComponent {
   artists = input.required<LikedArtist[]>();
   deleted = output<number>();
+
+  protected readonly sortedArtists = computed(() =>
+    [...this.artists()].sort((a, b) => a.name.localeCompare(b.name)),
+  );
 }
