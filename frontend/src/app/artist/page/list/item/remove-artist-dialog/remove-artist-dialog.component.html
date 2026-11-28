@@ -1,0 +1,10 @@
+<h2 mat-dialog-title>Remove {{ artistName }}?</h2>
+
+<mat-dialog-content>
+  <p>{{ artistName }} will be removed from your liked artists.</p>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button mat-button type="button" (click)="onCancel()">Cancel</button>
+  <button mat-flat-button type="button" color="warn" (click)="onConfirm()">Remove</button>
+</mat-dialog-actions>
